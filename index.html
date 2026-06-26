@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>Project X — Prototype Index</title>
 <!--
   XDS tokens used:
@@ -155,7 +158,9 @@
   .lede { margin: var(--space-6) auto 0; max-width: 560px;
     font-size: var(--fs-text16); line-height: var(--lh-text16); color: var(--label-secondary); }
 
-  .stat-row { display: flex; justify-content: center; gap: var(--space-12); margin-top: var(--space-12); flex-wrap: wrap; }
+  .stat-row { display: flex; justify-content: center; align-items: center; margin-top: var(--space-12); flex-wrap: wrap; }
+  .stat { padding: 0 var(--space-8); }
+  .stat + .stat { border-left: 1px solid var(--divider); }
   .stat .n { font-weight: 800; font-size: var(--fs-title32); line-height: var(--lh-title32); }
   .stat .l { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); margin-top: var(--space-1); }
 
@@ -216,10 +221,8 @@
   /* live preview */
   .preview { position: relative; border-radius: 8px; overflow: hidden;
     border: 1px solid var(--divider); background: var(--page-bg); aspect-ratio: 16/10; min-height: 230px; display: block; }
-  .preview .frame { position: absolute; top: 0; left: 0; width: 1440px; height: 900px; border: 0;
-    transform: scale(.315); transform-origin: top left; pointer-events: none;
-    transition: transform .55s var(--ease); }
-  .card:hover .preview .frame { transform: scale(.335); }
+  .preview .frame { position: absolute; top: 0; left: 0; border: 0; transform-origin: top left;
+    pointer-events: none; } /* width/height/scale set by JS fitFrame() to fill the area */
   .preview .live { position: absolute; top: var(--space-3); right: var(--space-3); z-index: 2;
     display: inline-flex; align-items: center; gap: 6px;
     font-size: var(--fs-text10, 10px); line-height: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -228,9 +231,17 @@
     animation: pulse 1.6s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 
-  /* reveal */
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
-  .reveal.in { opacity: 1; transform: none; }
+  /* reveal — transform-only entrance. Content is ALWAYS opaque/visible; the
+     animation only adds motion. If the animation pipeline is frozen or throttled
+     (as it can be in some embedded preview contexts), content still shows — it
+     just doesn't move. Never starts at opacity:0, so it can never get stuck blank. */
+  @keyframes revUp { from { transform: translateY(22px); } to { transform: none; } }
+  .reveal { animation: revUp .55s var(--ease) both; }
+  .persona-bar.reveal { animation-delay: .04s; }
+  header h1.reveal { animation-delay: .10s; }
+  .lede.reveal { animation-delay: .16s; }
+  .stat-row.reveal { animation-delay: .22s; }
+  @media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
 
   footer { border-top: 1px solid var(--divider); margin-top: var(--space-8);
     padding: var(--space-8) 0 var(--space-12); display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4);
@@ -291,17 +302,18 @@
       title: "Command Dashboard",
       desc: "The agent home base — pipeline, tasks and AI-surfaced moments in one calm, dense workspace.",
       chips: ["Dashboard", "XDS v2", "Desktop"],
-      href: "../projectx/v2/index.html",
+      href: "../projectx/v2/aicopilot.html",
       persona: ["solo"],
       action: "var(--system-action)", tint: "var(--system-tinted)"
     },
     {
-      tag: "Connect · AI Copilot",
-      title: "KWIQ",
-      desc: "A full-screen conversational copilot — prompt cards, intent routing and a live contacts spine.",
-      chips: ["AI Chat", "Conversational", "Live API"],
-      href: "../projectx/kwiq.html",
+      tag: "Command · Copilot",
+      title: "KWIQ Copilot",
+      desc: "A copilot that works next to you — it opens beside Command and the dashboard reflows to make room, so you keep your context and reference tasks and leads while you chat. Resizable and non-disruptive; built for quick, iterative asks.",
+      chips: ["Side panel", "Resizable", "Keeps context"],
+      href: "agent_copilot.html",
       persona: ["solo"],
+      triggerAI: true,
       action: "var(--purple-action)", tint: "var(--purple-tinted)"
     },
     {
@@ -315,14 +327,30 @@
     }
   ];
 
+  // Resolve hrefs against a normalized base dir so links work whether the page
+  // is served at /ideahub, /ideahub/, /ideahub/index.html, or via file://.
+  function baseDir() {
+    const u = new URL(location.href);
+    let p = u.pathname;
+    if (!p.endsWith("/")) {
+      p = /\/[^/]*\.[^/]*$/.test(p) ? p.replace(/[^/]*$/, "") : p + "/";
+    }
+    u.pathname = p; u.search = ""; u.hash = "";
+    return u.href;
+  }
+  const BASE = baseDir();
+  const resolve = (href) => new URL(href, BASE).href;
+
   const gallery = document.getElementById("gallery");
   protos.forEach((p, i) => {
+    const url = resolve(p.href);
     const el = document.createElement("article");
     el.className = "card reveal";
     el.dataset.persona = p.persona.join(" ");
+    if (p.triggerAI) el.dataset.triggerAi = "1";
     el.style.setProperty("--c", p.action);
     el.style.setProperty("--c-tint", p.tint);
-    el.style.transitionDelay = (i * 0.08) + "s";
+    el.style.animationDelay = (i * 0.08) + "s";
     el.innerHTML = `
       <div class="idx">${String(i+1).padStart(2,"0")}<div class="bar"></div></div>
       <div class="meta">
@@ -331,21 +359,49 @@
         <p>${p.desc}</p>
         <div class="chips">${p.chips.map(c=>`<span class="chip">${c}</span>`).join("")}</div>
         <div class="open">
-          <a class="btn" href="${p.href}">Open prototype <span class="arw">↗</span></a>
+          <a class="btn" href="${url}">Open prototype <span class="arw">↗</span></a>
         </div>
       </div>
-      <a class="preview" href="${p.href}" aria-label="Open ${p.title}">
+      <a class="preview" href="${url}" aria-label="Open ${p.title}">
         <span class="live">Live</span>
-        <iframe class="frame" src="${p.href}" loading="lazy" title="${p.title} preview" scrolling="no" tabindex="-1"></iframe>
+        <iframe class="frame" src="${url}" loading="lazy" title="${p.title} preview" scrolling="no" tabindex="-1"></iframe>
       </a>`;
     gallery.appendChild(el);
   });
 
-  // reveal on scroll
-  const io = new IntersectionObserver((es) => {
-    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  // Fill the entire preview area: scale each iframe so its 1440px-wide content
+  // covers its container width, and make it tall enough to cover the height too.
+  const IFRAME_W = 1440;
+  function fitFrame(frame) {
+    const prev = frame.closest(".preview");
+    if (!prev) return;
+    const w = prev.clientWidth, h = prev.clientHeight;
+    if (!w || !h) return;
+    const scale = w / IFRAME_W;
+    frame.style.width = IFRAME_W + "px";
+    frame.style.height = Math.ceil(h / scale) + "px";
+    frame.style.transform = "scale(" + scale + ")";
+  }
+  function fitAll() { document.querySelectorAll(".frame").forEach(fitFrame); }
+  const driveFrame = (frame, sel) => { try { const d = frame.contentDocument; const el = d && d.querySelector(sel); if (el) el.click(); } catch (e) {} };
+  document.querySelectorAll(".frame").forEach(f => f.addEventListener("load", () => {
+    fitFrame(f);
+    // this build opens the copilot by default — close it so previews show the
+    // dashboard at rest (retry to cover the app's hydration timing)
+    setTimeout(() => driveFrame(f, "[data-kwiq-close]"), 300);
+    setTimeout(() => driveFrame(f, "[data-kwiq-close]"), 900);
+  }));
+  addEventListener("resize", fitAll);
+  fitAll();
+
+  // On hover, trigger the AI copilot inside the live preview (opens the KWIQ
+  // drawer beside the dashboard); reset on leave so it replays each time.
+  document.querySelectorAll(".card[data-trigger-ai]").forEach(card => {
+    const frame = card.querySelector(".frame");
+    if (!frame) return;
+    card.addEventListener("mouseenter", () => driveFrame(frame, "[data-kwiq-open]"));
+    card.addEventListener("mouseleave", () => driveFrame(frame, "[data-kwiq-close]"));
+  });
 
   // persona segmented toggle — filters cards by audience
   const segBtns = document.querySelectorAll(".segmented button");
@@ -356,10 +412,12 @@
       const match = card.dataset.persona.split(" ").includes(persona);
       card.hidden = !match;
       if (match) {
-        card.style.transitionDelay = (i++ * 0.07) + "s";
-        // re-trigger the reveal animation for newly shown cards
-        card.classList.remove("in");
-        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add("in")));
+        const delay = i++;
+        // restart the CSS entrance animation for the now-visible card
+        card.style.animation = "none";
+        void card.offsetWidth; // force reflow so the animation replays
+        card.style.animation = "";
+        card.style.animationDelay = (delay * 0.07) + "s";
         shown++;
       }
     });
@@ -369,6 +427,7 @@
       b.classList.toggle("active", on);
       b.setAttribute("aria-selected", on ? "true" : "false");
     });
+    fitAll(); // re-fit previews now that visible cards/layout changed
   }
   segBtns.forEach(b => b.addEventListener("click", () => applyPersona(b.dataset.persona)));
   applyPersona("solo"); // default: Solo Agent
