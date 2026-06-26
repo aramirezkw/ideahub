@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project X — Prototype Index</title>
+<!--
+  XDS tokens used:
+  Color  — system.action #006C84, system.containerTinted #D5F7FF, system.divider;
+           neutral.pageBackground #F7F7F8, neutral.containerBackground #FFFFFF,
+           neutral.labelPrimary #282B33, neutral.labelSecondary #3D424D, neutral.labelTertiary #6C727E,
+           neutral.divider, green.action/containerTinted (Live), purple.* and blue.* (per-card accents)
+  Type   — Mulish (Google Fonts); fontSizeTitle32/24/20/16, fontSizeText16/14/12; mulishBold700 / mulishExtraBold800; textStyleCaps
+  Layout — 8px spacing scale (--space-*), shadow12 cards, 4px button radius
+  EXTENSION (flagged): hero display type scales above fontSizeTitle32 (Mulish ExtraBold, clamp up to ~132px)
+           for an editorial index cover — noted as a deliberate extension of the type scale.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* System (teal) */
+    --system-action: #006C84;
+    --system-action-hover: #0E4E5D;
+    --system-tinted: #D5F7FF;
+    --system-divider: rgba(0,108,132,.1);
+    /* Neutral */
+    --label-primary: #282B33;
+    --label-secondary: #3D424D;
+    --label-tertiary: #6C727E;
+    --label-inverse: #FFFFFF;
+    --page-bg: #F7F7F8;
+    --container-bg: #FFFFFF;
+    --container-tinted: #E4E5E7;
+    --divider: rgba(43,43,51,.1);
+    /* Supplementary accents (per-card) */
+    --purple-action: #6730B4;
+    --purple-tinted: #EFE8FB;
+    --blue-action: #0F5EAD;
+    --blue-tinted: #D9EFFF;
+    --green-action: #026E24;
+    --green-tinted: #D6F2DF;
+    /* Type scale */
+    --fs-title32: 32px; --lh-title32: 40px;
+    --fs-title24: 24px; --lh-title24: 32px;
+    --fs-title20: 20px; --lh-title20: 24px;
+    --fs-title16: 16px; --lh-title16: 20px;
+    --fs-text16: 16px; --lh-text16: 24px;
+    --fs-text14: 14px; --lh-text14: 20px;
+    --fs-text12: 12px; --lh-text12: 16px;
+    /* Spacing (8px base) */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px;
+    /* Elevation */
+    --shadow12: 0 4px 12px rgba(43,43,51,.08);
+    --shadow32: 0 12px 32px rgba(43,43,51,.14);
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ---------- XDS DARK THEME (Command shell) ----------
+     EXTENSION (flagged): the skill reference only ships exact light-theme hex.
+     Dark values below are derived per XDS dark-theme principles —
+     deep neutral surfaces + action colors brightened to hold WCAG AA on dark. */
+  [data-theme="dark"] {
+    --system-action: #2BB7D6;        /* brightened from system.actionActive #017C98 */
+    --system-action-hover: #4FCBE6;
+    --system-tinted: rgba(43,183,214,.16);
+    --system-divider: rgba(43,183,214,.22);
+    --label-primary: #F4F5F6;        /* ~neutral.labelInverse */
+    --label-secondary: #C4C7CE;
+    --label-tertiary: #8B919C;
+    --label-inverse: #16181D;
+    --page-bg: #16181D;              /* deep neutral shell background */
+    --container-bg: #20232B;         /* elevated container */
+    --container-tinted: #2C303A;
+    --divider: rgba(255,255,255,.10);
+    --purple-action: #A883EC;        /* brightened from purple.actionActive #8544DF */
+    --purple-tinted: rgba(168,131,236,.16);
+    --blue-action: #5AA8F0;          /* brightened from blue.action #0F5EAD */
+    --blue-tinted: rgba(90,168,240,.16);
+    --green-action: #4FC46E;         /* brightened from green.actionActive #0B8331 */
+    --green-tinted: rgba(79,196,110,.16);
+    --shadow12: 0 4px 12px rgba(0,0,0,.45);
+    --shadow32: 0 16px 40px rgba(0,0,0,.6);
+  }
+  /* dark-theme buttons keep dark label text on bright action fills for AA */
+  [data-theme="dark"] .open .btn { color: var(--label-inverse); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body, * { font-family: 'Mulish', sans-serif; }
+
+  body {
+    background: var(--page-bg);
+    color: var(--label-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* subtle XDS-tinted ambient wash (system.containerTinted, low opacity) */
+  .wash {
+    position: fixed; inset: -30% -10% auto -10%; height: 80vh; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(38% 50% at 16% 18%, rgba(0,108,132,.10), transparent 70%),
+      radial-gradient(42% 52% at 88% 8%, rgba(103,48,180,.07), transparent 72%);
+    filter: blur(8px);
+  }
+  [data-theme="dark"] .wash {
+    background:
+      radial-gradient(40% 52% at 14% 14%, rgba(43,183,214,.16), transparent 70%),
+      radial-gradient(44% 54% at 90% 6%, rgba(168,131,236,.13), transparent 72%);
+  }
+
+  .wrap { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 0 var(--space-12); }
+
+  /* caps label helper (textStyleCaps) */
+  .caps { text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+
+  /* ---------- nav (barHeader) ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-4) var(--space-12);
+    background: color-mix(in srgb, var(--page-bg) 72%, transparent); backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent; transition: border-color .35s var(--ease), background .35s var(--ease);
+  }
+  nav.stuck { border-color: var(--divider); }
+  .theme-toggle { display: inline-flex; align-items: center; gap: var(--space-2);
+    background: var(--container-tinted); color: var(--label-secondary); border: 1px solid var(--divider);
+    border-radius: 999px; height: 32px; padding: 0 var(--space-3); cursor: pointer;
+    font-family: 'Mulish', sans-serif; font-weight: 700; font-size: var(--fs-text12);
+    transition: color .25s var(--ease), background .25s var(--ease); }
+  .theme-toggle:hover { color: var(--label-primary); }
+  .nav-right { display: flex; align-items: center; gap: var(--space-6); }
+  .brand { display: flex; align-items: center; gap: var(--space-2);
+    font-weight: 800; font-size: var(--fs-title20); line-height: var(--lh-title20); letter-spacing: -.01em; }
+  .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--system-action); }
+  .nav-meta { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
+
+  /* ---------- persona toggle (above hero, centered) ---------- */
+  .persona-bar { display: flex; justify-content: center; padding-top: var(--space-12); }
+
+  /* ---------- hero (centered) ---------- */
+  header { padding: var(--space-8) 0 var(--space-12); text-align: center; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: var(--space-3);
+    font-size: var(--fs-text12); color: var(--system-action); margin-bottom: var(--space-6); }
+  .eyebrow::before, .eyebrow::after { content: ""; width: 40px; height: 2px; background: var(--system-action); }
+  h1 {
+    /* EXTENSION: display size above fontSizeTitle32, Mulish ExtraBold */
+    font-weight: 800; line-height: .94; letter-spacing: -.03em;
+    font-size: clamp(48px, 9.2vw, 132px); color: var(--label-primary);
+  }
+  h1 em { font-style: normal; color: var(--system-action); }
+  .lede { margin: var(--space-6) auto 0; max-width: 560px;
+    font-size: var(--fs-text16); line-height: var(--lh-text16); color: var(--label-secondary); }
+
+  .stat-row { display: flex; justify-content: center; gap: var(--space-12); margin-top: var(--space-12); flex-wrap: wrap; }
+  .stat .n { font-weight: 800; font-size: var(--fs-title32); line-height: var(--lh-title32); }
+  .stat .l { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); margin-top: var(--space-1); }
+
+  /* ---------- persona segmented toggle ---------- */
+  .persona { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;
+    padding-top: var(--space-4); }
+  .persona .lbl { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
+  .segmented { display: inline-flex; background: var(--container-tinted); border: 1px solid var(--divider);
+    border-radius: 999px; padding: var(--space-1); gap: var(--space-1); }
+  .segmented button { border: none; background: transparent; color: var(--label-secondary);
+    font-family: 'Mulish', sans-serif; font-weight: 700; font-size: var(--fs-text14); line-height: 1;
+    height: 34px; padding: 0 var(--space-4); border-radius: 999px; cursor: pointer; white-space: nowrap;
+    transition: background .25s var(--ease), color .25s var(--ease); }
+  .segmented button:hover { color: var(--label-primary); }
+  .segmented button.active { background: var(--system-action); color: var(--label-inverse); }
+  .persona .count { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
+
+  /* ---------- gallery ---------- */
+  .gallery { padding: var(--space-6) 0 var(--space-16); display: flex; flex-direction: column; gap: var(--space-6); }
+  .card[hidden] { display: none; }
+
+  .card {
+    position: relative; display: grid; grid-template-columns: 72px 1.05fr 1.3fr; gap: var(--space-8); align-items: stretch;
+    background: var(--container-bg); border: 1px solid var(--divider); border-radius: 12px;
+    padding: var(--space-8); box-shadow: var(--shadow12);
+    transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .45s var(--ease);
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow32); border-color: color-mix(in srgb, var(--c) 38%, var(--divider)); }
+
+  .idx { font-weight: 800; font-size: var(--fs-title24); line-height: var(--lh-title24); color: var(--container-tinted); }
+  .idx .bar { width: 3px; height: 0; background: var(--c); border-radius: 2px; margin-top: var(--space-3); transition: height .5s var(--ease); }
+  .card:hover .idx .bar { height: 48px; }
+
+  .meta { display: flex; flex-direction: column; }
+  .tag { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-2);
+    font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--c);
+    background: var(--c-tint); border-radius: 999px; padding: var(--space-1) var(--space-3); margin-bottom: var(--space-6); }
+  .meta h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.02;
+    font-size: clamp(28px, 3vw, 40px); color: var(--label-primary); }
+  .meta p { color: var(--label-secondary); font-size: var(--fs-text16); line-height: var(--lh-text16);
+    margin-top: var(--space-4); max-width: 42ch; }
+  .chips { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-6); }
+  .chip { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-secondary);
+    background: var(--page-bg); border: 1px solid var(--divider); padding: var(--space-1) var(--space-3); border-radius: 6px; }
+
+  .open { margin-top: auto; padding-top: var(--space-8); }
+  .open .btn {
+    display: inline-flex; align-items: center; gap: var(--space-3);
+    background: var(--c); color: #FFFFFF; border: none; border-radius: 4px;
+    font-family: 'Mulish', sans-serif; font-weight: 700; font-size: var(--fs-text14);
+    height: 40px; padding: 0 var(--space-6); cursor: pointer; text-decoration: none;
+    transition: filter .25s var(--ease), transform .25s var(--ease);
+  }
+  .open .btn:hover { filter: brightness(.92); }
+  .open .btn .arw { display: inline-flex; transition: transform .3s var(--ease); }
+  .open .btn:hover .arw { transform: translate(2px,-2px); }
+
+  /* live preview */
+  .preview { position: relative; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--divider); background: var(--page-bg); aspect-ratio: 16/10; min-height: 230px; display: block; }
+  .preview .frame { position: absolute; top: 0; left: 0; width: 1440px; height: 900px; border: 0;
+    transform: scale(.315); transform-origin: top left; pointer-events: none;
+    transition: transform .55s var(--ease); }
+  .card:hover .preview .frame { transform: scale(.335); }
+  .preview .live { position: absolute; top: var(--space-3); right: var(--space-3); z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--fs-text10, 10px); line-height: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--green-action); background: var(--green-tinted); padding: 4px 8px; border-radius: 999px; }
+  .preview .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green-action);
+    animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  footer { border-top: 1px solid var(--divider); margin-top: var(--space-8);
+    padding: var(--space-8) 0 var(--space-12); display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4);
+    font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
+
+  @media (max-width: 900px) {
+    .wrap, nav { padding-left: var(--space-6); padding-right: var(--space-6); }
+    .card { grid-template-columns: 1fr; gap: var(--space-6); }
+    .idx { display: flex; align-items: center; gap: var(--space-4); }
+    .idx .bar { display: none; }
+  }
+  @media (max-width: 760px) {
+    .nav-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wash"></div>
+
+  <nav id="nav">
+    <div class="brand"><span class="dot"></span>Project&nbsp;X</div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme"><span id="themeIcon">☀</span><span id="themeLabel">Light</span></button>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="persona-bar reveal">
+      <div class="segmented" role="tablist" aria-label="Audience">
+        <button id="seg-solo" class="active" role="tab" aria-selected="true" data-persona="solo">Solo Agent</button>
+        <button id="seg-mc" role="tab" aria-selected="false" data-persona="mc">MC Leader</button>
+      </div>
+    </div>
+
+    <header>
+      <h1 class="reveal">Project&nbsp;<em>X</em></h1>
+      <p class="lede reveal">The AI intelligence layer for Keller Cloud — it reasons over your data and KW's institutional knowledge, then acts on your behalf across Command and CommandMC. Explore the working prototypes below.</p>
+      <div class="stat-row reveal">
+        <div class="stat"><div class="n">03</div><div class="l caps">Live builds</div></div>
+        <div class="stat"><div class="n">XDS</div><div class="l caps">Design system</div></div>
+        <div class="stat"><div class="n">AA</div><div class="l caps">Accessible</div></div>
+      </div>
+    </header>
+
+    <main class="gallery" id="gallery"></main>
+
+    <footer>
+      <span>© 2026 Keller Williams · Project X</span>
+      <span>Built on XDS · Light &amp; dark</span>
+      <span>alfonso.ramirez@kw.com</span>
+    </footer>
+  </div>
+
+<script>
+  const protos = [
+    {
+      tag: "Command · Agent",
+      title: "Command Dashboard",
+      desc: "The agent home base — pipeline, tasks and AI-surfaced moments in one calm, dense workspace.",
+      chips: ["Dashboard", "XDS v2", "Desktop"],
+      href: "../projectx/v2/index.html",
+      persona: ["solo"],
+      action: "var(--system-action)", tint: "var(--system-tinted)"
+    },
+    {
+      tag: "Connect · AI Copilot",
+      title: "KWIQ",
+      desc: "A full-screen conversational copilot — prompt cards, intent routing and a live contacts spine.",
+      chips: ["AI Chat", "Conversational", "Live API"],
+      href: "../projectx/kwiq.html",
+      persona: ["solo"],
+      action: "var(--purple-action)", tint: "var(--purple-tinted)"
+    },
+    {
+      tag: "CommandMC · Associate",
+      title: "CommandMC",
+      desc: "Market-center intelligence for associates — the brokerage view of the KWIQ surface.",
+      chips: ["Associate", "Market Center", "Desktop"],
+      href: "../projectx/kwiq_mc.html",
+      persona: ["mc"],
+      action: "var(--blue-action)", tint: "var(--blue-tinted)"
+    }
+  ];
+
+  const gallery = document.getElementById("gallery");
+  protos.forEach((p, i) => {
+    const el = document.createElement("article");
+    el.className = "card reveal";
+    el.dataset.persona = p.persona.join(" ");
+    el.style.setProperty("--c", p.action);
+    el.style.setProperty("--c-tint", p.tint);
+    el.style.transitionDelay = (i * 0.08) + "s";
+    el.innerHTML = `
+      <div class="idx">${String(i+1).padStart(2,"0")}<div class="bar"></div></div>
+      <div class="meta">
+        <span class="tag caps">${p.tag}</span>
+        <h2>${p.title}</h2>
+        <p>${p.desc}</p>
+        <div class="chips">${p.chips.map(c=>`<span class="chip">${c}</span>`).join("")}</div>
+        <div class="open">
+          <a class="btn" href="${p.href}">Open prototype <span class="arw">↗</span></a>
+        </div>
+      </div>
+      <a class="preview" href="${p.href}" aria-label="Open ${p.title}">
+        <span class="live">Live</span>
+        <iframe class="frame" src="${p.href}" loading="lazy" title="${p.title} preview" scrolling="no" tabindex="-1"></iframe>
+      </a>`;
+    gallery.appendChild(el);
+  });
+
+  // reveal on scroll
+  const io = new IntersectionObserver((es) => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  // persona segmented toggle — filters cards by audience
+  const segBtns = document.querySelectorAll(".segmented button");
+  const countEl = document.getElementById("personaCount");
+  function applyPersona(persona) {
+    let shown = 0, i = 0;
+    document.querySelectorAll(".card").forEach(card => {
+      const match = card.dataset.persona.split(" ").includes(persona);
+      card.hidden = !match;
+      if (match) {
+        card.style.transitionDelay = (i++ * 0.07) + "s";
+        // re-trigger the reveal animation for newly shown cards
+        card.classList.remove("in");
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add("in")));
+        shown++;
+      }
+    });
+    if (countEl) countEl.textContent = shown + (shown === 1 ? " prototype" : " prototypes");
+    segBtns.forEach(b => {
+      const on = b.dataset.persona === persona;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
+  segBtns.forEach(b => b.addEventListener("click", () => applyPersona(b.dataset.persona)));
+  applyPersona("solo"); // default: Solo Agent
+
+  // sticky nav border
+  const nav = document.getElementById("nav");
+  addEventListener("scroll", () => nav.classList.toggle("stuck", scrollY > 24));
+
+  // theme toggle (dark default per Command shell)
+  const root = document.documentElement;
+  const tIcon = document.getElementById("themeIcon");
+  const tLabel = document.getElementById("themeLabel");
+  function syncToggle() {
+    const dark = root.getAttribute("data-theme") === "dark";
+    tIcon.textContent = dark ? "☀" : "☾";
+    tLabel.textContent = dark ? "Light" : "Dark";
+  }
+  syncToggle();
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    root.setAttribute("data-theme", root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    syncToggle();
+  });
+</script>
+</body>
+</html>
