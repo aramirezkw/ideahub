@@ -137,7 +137,8 @@
   .theme-toggle:hover { color: var(--label-primary); }
   .nav-right { display: flex; align-items: center; gap: var(--space-6); }
   .brand { display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 800; font-size: var(--fs-title20); line-height: var(--lh-title20); letter-spacing: -.01em; }
+    font-weight: 400; font-size: var(--fs-title20); line-height: var(--lh-title20); letter-spacing: -.01em; }
+  .brand em { font-style: normal; color: var(--system-action); }
   .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--system-action); }
   .nav-meta { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
 
@@ -262,7 +263,7 @@
   <div class="wash"></div>
 
   <nav id="nav">
-    <div class="brand"><span class="dot"></span>Project&nbsp;X</div>
+    <div class="brand"><span class="dot"></span>Project&nbsp;<em>X</em></div>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme"><span id="themeIcon">☀</span><span id="themeLabel">Light</span></button>
     </div>
@@ -298,10 +299,10 @@
 <script>
   const protos = [
     {
-      tag: "Command · Agent",
-      title: "Command Dashboard",
-      desc: "The agent home base — pipeline, tasks and AI-surfaced moments in one calm, dense workspace.",
-      chips: ["Dashboard", "XDS v2", "Desktop"],
+      tag: "Command · Overlay",
+      title: "KWIQ Overlay",
+      desc: "An AI overlay you step into. It opens above Command, dimming the dashboard for a focused, full-canvas session.",
+      chips: ["Overlay", "Full canvas", "Focused"],
       href: "agent_overlay.html",
       persona: ["solo"],
       triggerAI: true,
@@ -310,7 +311,7 @@
     {
       tag: "Command · Copilot",
       title: "KWIQ Copilot",
-      desc: "A copilot that works next to you — it opens beside Command and the dashboard reflows to make room, so you keep your context and reference tasks and leads while you chat. Resizable and non-disruptive; built for quick, iterative asks.",
+      desc: "A copilot beside you. Docks as a panel while Command reflows to make room, so you keep your context for quick, iterative asks.",
       chips: ["Side panel", "Resizable", "Keeps context"],
       href: "agent_copilot.html",
       persona: ["solo"],
