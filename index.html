@@ -189,11 +189,11 @@
     padding: var(--space-8); box-shadow: var(--shadow12);
     transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .45s var(--ease);
   }
-  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow32); border-color: color-mix(in srgb, var(--c) 38%, var(--divider)); }
+  /* card hover lift removed */
 
   .idx { font-weight: 800; font-size: var(--fs-title24); line-height: var(--lh-title24); color: var(--container-tinted); }
   .idx .bar { width: 3px; height: 0; background: var(--c); border-radius: 2px; margin-top: var(--space-3); transition: height .5s var(--ease); }
-  .card:hover .idx .bar { height: 48px; }
+  /* idx bar hover grow removed */
 
   .meta { display: flex; flex-direction: column; }
   .tag { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-2);
@@ -388,22 +388,15 @@
   const driveFrame = (frame, sel) => { try { const d = frame.contentDocument; const el = d && d.querySelector(sel); if (el) el.click(); } catch (e) {} };
   document.querySelectorAll(".frame").forEach(f => f.addEventListener("load", () => {
     fitFrame(f);
-    // this build opens the copilot by default — close it so previews show the
-    // dashboard at rest (retry to cover the app's hydration timing)
-    setTimeout(() => driveFrame(f, "[data-kwiq-close]"), 300);
-    setTimeout(() => driveFrame(f, "[data-kwiq-close]"), 900);
+    // previews show the AI layer active — these builds open it by default, and for
+    // the triggerAI cards we nudge it open to cover the app's hydration timing
+    const card = f.closest(".card[data-trigger-ai]");
+    if (card) { setTimeout(() => driveFrame(f, "[data-kwiq-open]"), 300); setTimeout(() => driveFrame(f, "[data-kwiq-open]"), 900); }
   }));
   addEventListener("resize", fitAll);
   fitAll();
 
-  // On hover, trigger the AI copilot inside the live preview (opens the KWIQ
-  // drawer beside the dashboard); reset on leave so it replays each time.
-  document.querySelectorAll(".card[data-trigger-ai]").forEach(card => {
-    const frame = card.querySelector(".frame");
-    if (!frame) return;
-    card.addEventListener("mouseenter", () => driveFrame(frame, "[data-kwiq-open]"));
-    card.addEventListener("mouseleave", () => driveFrame(frame, "[data-kwiq-close]"));
-  });
+  // Previews display the AI layer active by default — no hover trigger.
 
   // persona segmented toggle — filters cards by audience
   const segBtns = document.querySelectorAll(".segmented button");

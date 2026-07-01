@@ -580,7 +580,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         + '[data-kwiq-close]{display:none !important;}'
         + '[data-kwiq-messages]{max-width:none !important;align-self:stretch !important;padding-left:max(24px,calc((100% - 820px)/2)) !important;padding-right:max(24px,calc((100% - 820px)/2)) !important;}'
         + '[data-kwiq-drawer] > [data-kwiq-composer]{max-width:none !important;align-self:stretch !important;margin-left:0 !important;margin-right:0 !important;padding-left:max(24px,calc((100% - 820px)/2)) !important;padding-right:max(24px,calc((100% - 820px)/2)) !important;}'
+        + '[data-kwiq-cbox]{border-radius:4px !important;box-shadow:none !important;}'
         + '[data-kwiq-messages] span[style*="linear-gradient(135deg"][style*="border-radius: 8px"]{display:none !important;}'
+        + '[data-kwiq-newchat-btn]{position:absolute;top:14px;right:22px;z-index:20;display:inline-flex;align-items:center;gap:8px;height:40px;box-sizing:border-box;padding:0 20px;border:none;border-radius:4px;background:var(--action,#006C84);color:#fff;font:var(--fw-bold,700) 15px/1 Mulish,sans-serif;cursor:pointer;transition:background .15s;}'
+        + '[data-kwiq-newchat-btn]:focus-visible{outline:2px solid var(--action-focus-outline,rgba(0,108,132,.3));outline-offset:1px;}'
+        + '[data-kwiq-drawer].kwiq-chat [data-kwiq-messages]{padding-top:64px !important;}'
+        + '[data-kwiq-newchat-btn]:hover{background:var(--action-hover,#0E4E5D);}'
         + '[data-ai-nav]{position:relative;width:64px;height:48px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--action);transition:background .15s;}'
         + '[data-ai-nav]:hover{background:var(--action-hover-fill);}'
         + '[data-ai-nav].on{background:var(--action-hover-fill);}'
@@ -613,6 +618,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
   function openSurface() { var a = app(); if (!a) return; if (typeof a.kwiqOpen === 'function') a.kwiqOpen(); else a._kwiqOpen = true; }
+  var NEWCHAT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+  function chatMode() { var e = document.querySelector('[data-kwiq-empty]'); return !!(e && getComputedStyle(e).display === 'none'); }
+  function ensureNewChat() {
+    var drawer = document.querySelector('[data-kwiq-drawer]');
+    if (!drawer) return;
+    var btn = drawer.querySelector('[data-kwiq-newchat-btn]');
+    var show = surfaceOpen() && chatMode();
+    if (drawer.classList.contains('kwiq-chat') !== show) drawer.classList.toggle('kwiq-chat', show);
+    if (show) {
+      if (!btn) { btn = document.createElement('button'); btn.setAttribute('data-kwiq-newchat-btn', ''); btn.setAttribute('title', 'New Session'); btn.innerHTML = NEWCHAT_ICON + 'New Session'; drawer.appendChild(btn); }
+      btn.style.display = 'inline-flex';
+    } else if (btn) { btn.style.display = 'none'; }
+  }
   function ensureNav() {
     styleEl();
     var r = rail(); if (!r) return;
@@ -632,7 +650,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.addEventListener('click', function (ev) {
     if (!ev.target.closest) return;
     var b = ev.target.closest('[data-ai-nav]');
-    if (b) { ev.preventDefault(); ev.stopPropagation(); openSurface(); setTimeout(ensureNav, 60); return; }
+    if (b) { ev.preventDefault(); ev.stopPropagation(); openSurface(); var ah = app(); if (ah && typeof ah.kwiqNewChat === 'function') ah.kwiqNewChat(); setTimeout(function () { syncSurface(); ensureNav(); ensureNewChat(); }, 0); return; }
+    var nc = ev.target.closest('[data-kwiq-newchat-btn]');
+    if (nc) { ev.preventDefault(); ev.stopPropagation(); var an = app(); if (an && typeof an.kwiqNewChat === 'function') an.kwiqNewChat(); setTimeout(function () { syncSurface(); ensureNewChat(); }, 0); return; }
     // Any other left-rail tab (Home, etc.) closes the AI surface and reveals the dashboard underneath.
     var nav = ev.target.closest('button');
     if (nav && !nav.hasAttribute('data-ai-nav') && nav.parentElement === rail() && surfaceOpen()) {
@@ -644,6 +664,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   var defaulted = false, opened = false, ticks = 0;
   function tick() {
     ensureNav();
+    ensureNewChat();
     syncSurface();
     if (!defaulted) {
       bootCover();
@@ -656,6 +677,119 @@ document.addEventListener('DOMContentLoaded', async function() {
   try { new MutationObserver(tick).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
   setInterval(tick, 250);
   if (document.readyState !== 'loading') tick(); else document.addEventListener('DOMContentLoaded', tick);
+})();
+</script>
+<script>
+/* KWIQ — "Recent" button (AI homepage, top-right) opens a right slide-out Conversations panel. */
+(function () {
+  var F = "Mulish,sans-serif";
+  var HIST_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>';
+  var RECENT = [
+    { group: "Today", title: "Listing description for 1247 Ocean Ave", sub: "Draft 3 with staging highlights · 2h ago" },
+    { group: "Today", title: "Pipeline summary and next actions", sub: "7 contacts to call today · 4h ago" },
+    { group: "Yesterday", title: "Follow-up plan for the Hendersons", sub: "Financing question resolved" },
+    { group: "Yesterday", title: "Market update email — Santa Monica", sub: "April absorption + median price" },
+    { group: "This week", title: "CMA for 1255 Kings Road", sub: "Estimated value $612K · 5 comps" },
+    { group: "This week", title: "Social carousel — March stats", sub: "3-slide caption set" }
+  ];
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function app() { return window.__kwiqApp || null; }
+  function onHome() { var e = document.querySelector("[data-kwiq-empty]"); return !!(e && getComputedStyle(e).display !== "none"); }
+  function surfaceOpen() { var a = app(); return !!(a && a._kwiqOpen); }
+
+  function ensureStyle() {
+    if (document.getElementById("kwiq-recent-css")) return;
+    var s = document.createElement("style"); s.id = "kwiq-recent-css";
+    s.textContent =
+      '[data-kwiq-recent-btn]{position:absolute;top:14px;right:22px;z-index:20;display:none;align-items:center;gap:7px;height:36px;box-sizing:border-box;padding:0 14px;border:1.5px solid var(--action,#006C84);border-radius:4px;background:var(--container-bg,#fff);color:var(--action,#006C84);font:700 14px/1 ' + F + ';cursor:pointer;transition:background .15s;}' +
+      '[data-kwiq-recent-btn]:hover{background:var(--action-hover-fill,rgba(0,108,132,.1));}' +
+      '[data-kwiq-recent-backdrop]{position:fixed;inset:0;background:rgba(20,24,29,.35);opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:8999;}' +
+      '[data-kwiq-recent-backdrop].open{opacity:1;pointer-events:auto;}' +
+      '[data-kwiq-recent-panel]{position:fixed;top:0;right:0;height:100vh;width:min(380px,92vw);background:#fff;box-shadow:-10px 0 34px rgba(13,39,48,.18);transform:translateX(100%);transition:transform .34s cubic-bezier(.16,1,.3,1);z-index:9000;display:flex;flex-direction:column;font-family:' + F + ';}' +
+      '[data-kwiq-recent-panel].open{transform:translateX(0);}' +
+      '.kwiq-rc-head{display:flex;align-items:center;justify-content:space-between;padding:22px 22px 14px;}' +
+      '.kwiq-rc-title{font:800 20px/26px ' + F + ';color:var(--label-primary,#282b33);}' +
+      '.kwiq-rc-x{border:none;background:none;color:var(--label-secondary,#3d424d);cursor:pointer;padding:5px;display:flex;border-radius:4px;}' +
+      '.kwiq-rc-x:hover{background:var(--container-tinted,#f1f3f4);}' +
+      '.kwiq-rc-search{position:relative;padding:0 22px 12px;}' +
+      '.kwiq-rc-search svg{position:absolute;left:35px;top:11px;color:var(--label-tertiary,#6c727e);}' +
+      '.kwiq-rc-search input{width:100%;height:40px;box-sizing:border-box;border:1px solid var(--outline,#e7ebee);border-radius:4px;padding:0 12px 0 38px;font:400 14px/1 ' + F + ';color:var(--label-primary,#282b33);outline:none;}' +
+      '.kwiq-rc-search input:focus{border-color:var(--action,#006C84);}' +
+      '.kwiq-rc-list{flex:1;overflow:auto;padding:4px 12px 20px;}' +
+      '.kwiq-rc-head2{font:700 11px/14px ' + F + ';letter-spacing:.09em;color:var(--label-tertiary,#6c727e);padding:14px 10px 6px;}' +
+      '.kwiq-rc-row{display:block;width:100%;text-align:left;border:none;background:none;cursor:pointer;padding:10px;border-radius:6px;}' +
+      '.kwiq-rc-row:hover{background:var(--container-tinted,#f1f3f4);}' +
+      '.kwiq-rc-rtitle{font:800 15px/20px ' + F + ';color:var(--label-primary,#282b33);}' +
+      '.kwiq-rc-rsub{font:400 13px/18px ' + F + ';color:var(--label-tertiary,#6c727e);margin-top:2px;}' +
+      '.kwiq-rc-empty{padding:20px 12px;font:400 13px ' + F + ';color:var(--label-tertiary,#6c727e);}';
+    (document.head || document.documentElement).appendChild(s);
+  }
+  function renderList(q) {
+    q = (q || "").trim().toLowerCase();
+    var groups = ["Today", "Yesterday", "This week"], html = "";
+    groups.forEach(function (g) {
+      var items = RECENT.filter(function (c) { return c.group === g && (!q || (c.title + " " + c.sub).toLowerCase().indexOf(q) >= 0); });
+      if (!items.length) return;
+      html += '<div class="kwiq-rc-head2">' + g.toUpperCase() + '</div>';
+      items.forEach(function (c) { html += '<button class="kwiq-rc-row" data-kwiq-rc-row><div class="kwiq-rc-rtitle">' + esc(c.title) + '</div><div class="kwiq-rc-rsub">' + esc(c.sub) + '</div></button>'; });
+    });
+    if (!html) html = '<div class="kwiq-rc-empty">No conversations found.</div>';
+    return html;
+  }
+  function ensurePanel() {
+    ensureStyle();
+    var bd = document.querySelector("[data-kwiq-recent-backdrop]");
+    if (!bd) { bd = document.createElement("div"); bd.setAttribute("data-kwiq-recent-backdrop", ""); document.body.appendChild(bd); }
+    var p = document.querySelector("[data-kwiq-recent-panel]");
+    if (!p) {
+      p = document.createElement("aside"); p.setAttribute("data-kwiq-recent-panel", "");
+      p.innerHTML =
+        '<div class="kwiq-rc-head"><span class="kwiq-rc-title">Conversations</span>'
+        + '<button class="kwiq-rc-x" data-kwiq-recent-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'
+        + '<div class="kwiq-rc-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input data-kwiq-recent-search type="text" placeholder="Search conversations"></div>'
+        + '<div class="kwiq-rc-list" data-kwiq-recent-list></div>';
+      document.body.appendChild(p);
+    }
+    return p;
+  }
+  function open() {
+    var p = ensurePanel();
+    p.querySelector("[data-kwiq-recent-list]").innerHTML = renderList("");
+    var srch = p.querySelector("[data-kwiq-recent-search]"); if (srch) srch.value = "";
+    document.querySelector("[data-kwiq-recent-backdrop]").classList.add("open");
+    p.classList.add("open");
+  }
+  function close() {
+    var p = document.querySelector("[data-kwiq-recent-panel]"); if (p) p.classList.remove("open");
+    var bd = document.querySelector("[data-kwiq-recent-backdrop]"); if (bd) bd.classList.remove("open");
+  }
+  function ensureButton() {
+    ensureStyle();
+    var drawer = document.querySelector("[data-kwiq-drawer]"); if (!drawer) return;
+    var btn = drawer.querySelector("[data-kwiq-recent-btn]");
+    var show = surfaceOpen() && onHome();
+    if (show) {
+      if (!btn) { btn = document.createElement("button"); btn.setAttribute("data-kwiq-recent-btn", ""); btn.setAttribute("title", "Recent"); btn.innerHTML = HIST_ICON + "Recent"; drawer.appendChild(btn); }
+      btn.style.display = "inline-flex";
+    } else if (btn) { btn.style.display = "none"; }
+  }
+
+  document.addEventListener("click", function (ev) {
+    if (!ev.target.closest) return;
+    if (ev.target.closest("[data-kwiq-recent-btn]")) { ev.preventDefault(); ev.stopPropagation(); open(); return; }
+    if (ev.target.closest("[data-kwiq-recent-close]") || ev.target.hasAttribute && ev.target.hasAttribute("data-kwiq-recent-backdrop")) { ev.preventDefault(); ev.stopPropagation(); close(); return; }
+    if (ev.target.closest("[data-kwiq-rc-row]")) { ev.preventDefault(); ev.stopPropagation(); close(); return; }
+  }, true);
+  document.addEventListener("input", function (ev) {
+    if (ev.target && ev.target.matches && ev.target.matches("[data-kwiq-recent-search]")) {
+      var list = document.querySelector("[data-kwiq-recent-list]"); if (list) list.innerHTML = renderList(ev.target.value);
+    }
+  }, true);
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { var p = document.querySelector("[data-kwiq-recent-panel].open"); if (p) close(); }
+  }, true);
+  setInterval(ensureButton, 250);
+  ensureButton();
 })();
 </script>
 </body>
