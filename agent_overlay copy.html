@@ -984,9 +984,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.kap-addtl{width:100%;height:44px;border:none;border-radius:4px;background:var(--action,#006C84);color:#fff;font:var(--fw-bold,700) 15px/1 var(--font-sans);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}' +
       '.kap-addtl:hover{background:var(--action-hover,#0E4E5D);}' +
       '.kap-success{position:relative;margin:-18px;min-height:calc(100% + 36px);background:#fff;box-sizing:border-box;overflow:hidden;}' +
-      '.kap-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2;}' +
-      '.kap-confetti span{position:absolute;border-radius:2px;opacity:0;animation:kapConfetti 1.3s ease-out forwards;}' +
-      '@keyframes kapConfetti{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--tx,0),var(--ty,-200px)) rotate(var(--r,180deg));opacity:0}}' +
+      '.kap-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}' +
+      '.kap-confetti span{position:absolute;border-radius:2px;opacity:0;animation-name:kapConfetti;animation-timing-function:cubic-bezier(.35,.12,.5,1);animation-fill-mode:forwards;}' +
+      '@keyframes kapConfetti{0%{transform:translate(0,0) rotate(0);opacity:0}7%{opacity:1}100%{transform:translate(var(--tx,0),var(--ty,620px)) rotate(var(--r,540deg));opacity:0}}' +
       '.kap-success-in{position:relative;z-index:3;padding:28px 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;}' +
       '.kap-badge{width:64px;height:64px;border-radius:50%;background:var(--kw-system-tint,#D5F7FF);color:var(--action,#006C84);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}' +
       '.kap-success-h{font:var(--fw-extrabold,800) 22px/28px var(--font-sans);color:var(--label-primary,#282b33);margin:0 0 6px;}' +
@@ -1000,7 +1000,83 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.kap-stats{display:flex;gap:10px;width:100%;margin-bottom:22px;}' +
       '.kap-stats>div{flex:1;background:var(--kw-neutral-100,#f7f7f8);border-radius:10px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;}' +
       '.kap-stats b{font:var(--fw-extrabold,800) 20px/24px var(--font-sans);color:var(--label-primary,#282b33);}' +
-      '.kap-stats span{font:var(--fw-bold,700) 11px/14px var(--font-sans);color:var(--label-tertiary,#6c727e);margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}';
+      '.kap-stats span{font:var(--fw-bold,700) 11px/14px var(--font-sans);color:var(--label-tertiary,#6c727e);margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}' +
+      '.kap-em{margin:-18px;min-height:calc(100% + 36px);display:flex;flex-direction:column;background:var(--page-background,#f7f7f8);box-sizing:border-box;}' +
+      '.kap-em-scroll{flex:1;min-height:0;overflow-y:auto;padding:18px 18px 6px;}' +
+      '.kap-em-field{margin-bottom:14px;}' +
+      '.kap-em-label{display:block;font:var(--fw-extrabold,800) 13px/18px var(--font-sans);color:var(--label-primary,#282b33);margin-bottom:6px;}' +
+      '.kap-em-from{font:var(--fw-regular,400) 15px/22px var(--font-sans);color:var(--label-secondary,#3d424d);}' +
+      '.kap-em-chip{display:inline-flex;align-items:center;background:var(--kw-neutral-200,#e4e5e7);color:var(--label-secondary,#3d424d);font:var(--fw-bold,700) 13px/1 var(--font-sans);padding:9px 13px;border-radius:6px;}' +
+      '.kap-em-subject{width:100%;box-sizing:border-box;border:1.5px solid var(--divider,#e7ebee);border-radius:6px;padding:12px 14px;font:var(--fw-bold,700) 15px/20px var(--font-sans);color:var(--label-primary,#282b33);outline:none;}' +
+      '.kap-em-subject:focus{border-color:var(--action,#006C84);}' +
+      '.kap-eb-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:8px;border:1px solid var(--divider,#e7ebee);border-radius:8px 8px 0 0;background:#fff;}' +
+      '.kap-eb-sel{display:inline-flex;align-items:center;gap:10px;height:34px;padding:0 12px;border:1px solid var(--divider,#e7ebee);border-radius:6px;background:#fff;font:var(--fw-bold,700) 13px/1 var(--font-sans);color:var(--label-primary,#282b33);cursor:pointer;}' +
+      '.kap-eb-sel svg{color:var(--label-tertiary,#6c727e);}' +
+      '.kap-eb-btn{min-width:32px;height:32px;padding:0 6px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--label-secondary,#3d424d);font:var(--fw-extrabold,800) 15px/1 var(--font-sans);}' +
+      '.kap-eb-btn:hover{background:var(--kw-neutral-200,#e4e5e7);}' +
+      '.kap-eb-sep{width:1px;height:22px;background:var(--divider,#e7ebee);margin:0 3px;}' +
+      '.kap-em-editor{border:1px solid var(--divider,#e7ebee);border-top:none;border-radius:0 0 8px 8px;min-height:220px;padding:14px 16px;font:var(--fw-regular,400) 15px/22px var(--font-sans);color:var(--label-primary,#282b33);outline:none;background:#fff;}' +
+      '.kap-em-editor:empty:before{content:attr(data-ph);color:var(--label-tertiary,#6c727e);}' +
+      '.kap-em-tools{flex:none;display:flex;flex-wrap:wrap;gap:22px;align-items:center;padding:12px 18px;background:var(--page-background,#f7f7f8);}' +
+      '.kap-eb-act{border:none;background:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:var(--fw-bold,700) 15px/1 var(--font-sans);color:var(--action,#006C84);}' +
+      '.kap-eb-act:hover{color:var(--action-hover,#0E4E5D);}' +
+      '.kap-em-foot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-top:1px solid var(--divider,#e7ebee);background:#fff;flex-wrap:wrap;}' +
+      '.kap-em-quota{font:var(--fw-regular,400) 13px/18px var(--font-sans);color:var(--label-tertiary,#6c727e);}' +
+      '.kap-em-manage{color:var(--action,#006C84);font-weight:700;cursor:pointer;}' +
+      '.kap-em-foot-r{display:flex;align-items:center;gap:18px;}' +
+      '.kap-em-discard{border:none;background:none;cursor:pointer;font:var(--fw-bold,700) 15px/1 var(--font-sans);color:var(--action,#006C84);}' +
+      '.kap-em-send{border:none;border-radius:4px;height:40px;padding:0 24px;font:var(--fw-bold,700) 15px/1 var(--font-sans);color:#fff;background:var(--action,#006C84);cursor:pointer;opacity:.45;pointer-events:none;transition:opacity .15s,background .15s;}' +
+      '.kap-em-send.on{opacity:1;pointer-events:auto;} .kap-em-send.on:hover{background:var(--action-hover,#0E4E5D);}' +
+      '.kap-sms{margin:-18px;min-height:calc(100% + 36px);display:flex;flex-direction:column;background:var(--page-background,#f7f7f8);box-sizing:border-box;}' +
+      '.kap-sms-scroll{flex:1;min-height:0;overflow-y:auto;padding:18px;}' +
+      '.kap-sms-intro{font:var(--fw-extrabold,800) 15px/22px var(--font-sans);color:var(--label-primary,#282b33);margin:0 0 14px;}' +
+      '.kap-sms-recip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0 12px;border-bottom:1px solid var(--divider,#e7ebee);margin-bottom:12px;}' +
+      '.kap-sms-name{font:var(--fw-extrabold,800) 15px/20px var(--font-sans);color:var(--label-primary,#282b33);}' +
+      '.kap-sms-phone{font:var(--fw-regular,400) 15px/20px var(--font-sans);color:var(--label-tertiary,#6c727e);display:inline-flex;align-items:center;gap:6px;}' +
+      '.kap-sms-note{font:var(--fw-regular,400) 13px/19px var(--font-sans);color:var(--label-secondary,#3d424d);margin:0 0 16px;}' +
+      '.kap-sms-msghead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}' +
+      '.kap-sms-count{font:var(--fw-bold,700) 13px/18px var(--font-sans);color:var(--label-tertiary,#6c727e);}' +
+      '.kap-sms-ta{width:100%;box-sizing:border-box;min-height:96px;border:1px solid var(--divider,#e7ebee);border-radius:6px;padding:12px 14px;font:var(--fw-regular,400) 15px/22px var(--font-sans);color:var(--label-primary,#282b33);outline:none;resize:vertical;background:#fff;}' +
+      '.kap-sms-ta:focus{border-color:var(--action,#006C84);}' +
+      '.kap-sms-drop{margin-top:12px;border:1.5px dashed var(--kw-neutral-300,#c8cbd0);border-radius:8px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;color:var(--label-tertiary,#6c727e);}' +
+      '.kap-sms-drop b{font:var(--fw-bold,700) 14px/20px var(--font-sans);color:var(--label-primary,#282b33);}' +
+      '.kap-sms-drop small{font:var(--fw-regular,400) 12px/16px var(--font-sans);color:var(--label-tertiary,#6c727e);}' +
+      '.kap-sms-acct{margin-top:20px;padding-top:16px;border-top:1px solid var(--divider,#e7ebee);}' +
+      '.kap-sms-h{font:var(--fw-extrabold,800) 15px/20px var(--font-sans);color:var(--label-primary,#282b33);margin:16px 0 8px;}' +
+      '.kap-sms-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font:var(--fw-bold,700) 14px/20px var(--font-sans);color:var(--label-primary,#282b33);padding:3px 0;}' +
+      '.kap-sms-row.sub{font-weight:400;color:var(--label-tertiary,#6c727e);font-size:13px;}' +
+      '.kap-sms-calc{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--action,#006C84);border:1.5px solid var(--action,#006C84);border-radius:4px;height:36px;padding:0 16px;font:var(--fw-bold,700) 14px/1 var(--font-sans);cursor:pointer;}' +
+      '.kap-sms-calc:hover{background:var(--action-hover-fill,rgba(0,108,132,.1));}' +
+      '.kap-sms-sugglbl{font:var(--fw-bold,700) 12px/16px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary,#6c727e);margin:16px 0 8px;}' +
+      '.kap-sms-sugg{display:flex;flex-wrap:wrap;gap:8px;}' +
+      '.kap-sms-chip{border:1px solid var(--divider,#e7ebee);background:#fff;border-radius:999px;padding:7px 14px;font:var(--fw-bold,700) 13px/18px var(--font-sans);color:var(--label-secondary,#3d424d);cursor:pointer;transition:background .12s,border-color .12s,color .12s;}' +
+      '.kap-sms-chip:hover{background:var(--kw-system-tint,#D5F7FF);border-color:var(--action,#006C84);color:var(--action,#006C84);}' +
+      '.kap-sms-warn{font:var(--fw-regular,400) 12px/17px var(--font-sans);color:var(--label-tertiary,#6c727e);margin:18px 0 0;padding-top:14px;border-top:1px solid var(--divider,#e7ebee);}' +
+      '.kap-cf{margin:-18px;min-height:calc(100% + 36px);display:flex;flex-direction:column;background:var(--page-background,#f7f7f8);box-sizing:border-box;}' +
+      '.kap-cf-scroll{flex:1;min-height:0;overflow-y:auto;padding:18px;}' +
+      '.kap-cf-field{margin-bottom:18px;}' +
+      '.kap-cf-label{display:flex;align-items:center;gap:6px;font:var(--fw-extrabold,800) 14px/20px var(--font-sans);color:var(--label-primary,#282b33);margin-bottom:8px;}' +
+      '.kap-cf-req{color:#CC0000;}' +
+      '.kap-cf-warn{display:none;color:#CC0000;}' +
+      '.kap-cf-input{width:100%;box-sizing:border-box;border:1.5px solid var(--divider,#e7ebee);border-radius:6px;padding:12px 14px;font:var(--fw-regular,400) 15px/20px var(--font-sans);color:var(--label-primary,#282b33);outline:none;background:#fff;}' +
+      '.kap-cf-input:focus{border-color:var(--action,#006C84);}' +
+      '.kap-cf-field.error .kap-cf-label{color:#CC0000;} .kap-cf-field.error .kap-cf-warn{display:inline-flex;} .kap-cf-field.error .kap-cf-input{border-color:#CC0000;} .kap-cf-field.error .kap-cf-err{display:block;}' +
+      '.kap-cf-err{display:none;font:var(--fw-regular,400) 13px/18px var(--font-sans);color:#CC0000;margin-top:6px;}' +
+      '.kap-cf-link{display:inline-flex;align-items:center;gap:8px;border:none;background:none;cursor:pointer;font:var(--fw-extrabold,800) 15px/1 var(--font-sans);color:var(--action,#006C84);margin-bottom:18px;}' +
+      '.kap-cf-row{display:flex;gap:10px;align-items:stretch;}' +
+      '.kap-cf-row .kap-cf-input{flex:1;min-width:0;}' +
+      '.kap-cf-sel{flex:none;min-width:118px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--divider,#e7ebee);border-radius:6px;padding:0 12px;height:46px;background:#fff;font:var(--fw-bold,700) 14px/1 var(--font-sans);color:var(--label-secondary,#3d424d);cursor:pointer;}' +
+      '.kap-cf-sel.full{width:100%;min-width:0;color:var(--label-tertiary,#6c727e);font-weight:400;}' +
+      '.kap-cf-sel svg{color:var(--label-tertiary,#6c727e);flex:none;}' +
+      '.kap-cf-phone{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:1px solid var(--divider,#e7ebee);border-radius:6px;padding:0 12px;height:46px;background:#fff;}' +
+      '.kap-cf-phone input{flex:1;min-width:0;border:none;outline:none;font:var(--fw-regular,400) 15px/1 var(--font-sans);color:var(--label-primary,#282b33);background:transparent;}' +
+      '.kap-cf-radios{display:flex;gap:26px;align-items:center;}' +
+      '.kap-cf-radio{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font:var(--fw-bold,700) 15px/1 var(--font-sans);color:var(--label-primary,#282b33);}' +
+      '.kap-cf-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--kw-neutral-300,#c8cbd0);display:flex;align-items:center;justify-content:center;box-sizing:border-box;}' +
+      '.kap-cf-radio.on .kap-cf-dot{border-color:var(--action,#006C84);} .kap-cf-radio.on .kap-cf-dot:after{content:"";width:11px;height:11px;border-radius:50%;background:var(--action,#006C84);}' +
+      '.kap-cf-check{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font:var(--fw-bold,700) 15px/1 var(--font-sans);color:var(--label-primary,#282b33);margin-bottom:18px;}' +
+      '.kap-cf-box{width:24px;height:24px;border-radius:4px;border:2px solid var(--kw-neutral-400,#aeb2ba);display:flex;align-items:center;justify-content:center;color:#fff;box-sizing:border-box;}' +
+      '.kap-cf-check.on .kap-cf-box{background:var(--action,#006C84);border-color:var(--action,#006C84);}';
     (document.head||document.documentElement).appendChild(s);
   }
   function ensureEls(){
@@ -1040,11 +1116,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.addEventListener('mousedown',function(ev){ var r=ev.target.closest&&ev.target.closest('[data-kap-resizer]'); if(!r)return; ev.preventDefault(); r.classList.add('dragging'); drag=r; document.body.style.userSelect='none'; });
   document.addEventListener('mousemove',function(ev){ if(!drag)return; var d=drawer(); if(!d)return; var rect=d.getBoundingClientRect(); setW(rect.right-ev.clientX); });
   document.addEventListener('mouseup',function(){ if(drag){drag.classList.remove('dragging'); drag=null; document.body.style.userSelect='';} });
+  document.addEventListener('input',function(ev){ if(ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-em-body')){ var s=document.querySelector('[data-em-send]'); if(s){ s.classList.toggle('on', (ev.target.textContent||'').trim().length>0); } } },true);
+  document.addEventListener('input',function(ev){ if(ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-sms-body')){ var v=ev.target.value||''; var cnt=document.querySelector('[data-sms-count]'); if(cnt) cnt.textContent=v.length+'/160'; var s=document.querySelector('[data-sms-send]'); if(s) s.classList.toggle('on', v.trim().length>0); } },true);
+  document.addEventListener('input',function(ev){ if(ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-cf-name')){ var fld=ev.target.closest('[data-cf-namefield]'); if(fld && (ev.target.value||'').trim()) fld.classList.remove('error'); } },true);
   document.addEventListener('click',function(ev){ if(ev.target.closest&&ev.target.closest('[data-kap-close]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); } },true);
   document.addEventListener('click',function(ev){
     if(!ev.target.closest) return;
     var call=ev.target.closest('.kc-act[data-kc-act="call"]');
     if(call){ ev.preventDefault(); ev.stopPropagation(); var card=call.closest('.kc-card'); var nm=(card?((card.querySelector('.kc-name')||{}).textContent||'').trim():'')||'Lead'; openPanel('Call', callHTML(nm,'+1 917-123-9182'), {noHeader:true}); window.__kapCallName=nm; clearTimeout(window.__kapCallTimer); window.__kapCallTimer=setTimeout(function(){ var d=drawer(); if(d&&d.classList.contains('kwiq-has-panel')) openSummary(window.__kapCallName); }, 3000); return; }
+    var mail=ev.target.closest('.kc-act[data-kc-act="email"]');
+    if(mail){ ev.preventDefault(); ev.stopPropagation(); var mc=mail.closest('.kc-card'); var mn=(mc?((mc.querySelector('.kc-name')||{}).textContent||'').trim():'')||'Lead'; openPanel('Email', emailBuilderHTML(mn), {noHeader:true}); return; }
+    var text=ev.target.closest('.kc-act[data-kc-act="text"]');
+    if(text){ ev.preventDefault(); ev.stopPropagation(); var tc=text.closest('.kc-card'); var tn=(tc?((tc.querySelector('.kc-name')||{}).textContent||'').trim():'')||'Lead'; openPanel('Send Text Message', smsBuilderHTML(tn, '+1 213 631 6013'), {noChip:true}); return; }
     if(ev.target.closest('[data-kap-endcall]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); return; }
     var tab=ev.target.closest('[data-kap-tab]');
     if(tab){ ev.preventDefault(); var which=tab.getAttribute('data-kap-tab'); var wrap=tab.closest('.kap-sum'); if(wrap){ var ts=wrap.querySelectorAll('[data-kap-tab]'); for(var i=0;i<ts.length;i++) ts[i].classList.toggle('on', ts[i]===tab); var ps=wrap.querySelectorAll('[data-kap-pane]'); for(var j=0;j<ps.length;j++) ps[j].style.display=(ps[j].getAttribute('data-kap-pane')===which)?'':'none'; } return; }
@@ -1052,6 +1135,27 @@ document.addEventListener('DOMContentLoaded', async function() {
     if(tl){ ev.preventDefault(); ev.stopPropagation(); if(tl.disabled) return; tl.disabled=true; var nm2=tl.getAttribute('data-kap-addtimeline')||'Lead'; var a=window.__kwiqApp; if(a&&a.kwiqMakeKwiq){ var m=document.querySelector('[data-kwiq-messages]'); if(m){ m.appendChild(a.kwiqMakeKwiq('Added your call with '+nm2+' to the timeline.')); m.scrollTop=m.scrollHeight; } } openSuccess(nm2); return; }
     if(ev.target.closest('[data-kap-next]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); return; }
     if(ev.target.closest('[data-kap-play]')){ ev.preventDefault(); ev.stopPropagation(); return; }
+    var ebc=ev.target.closest('[data-eb-cmd]');
+    if(ebc){ ev.preventDefault(); var cmd=ebc.getAttribute('data-eb-cmd'); var eb=document.querySelector('[data-em-body]'); if(eb){ eb.focus(); try{ if(cmd==='__link'){ document.execCommand('createLink',false,'https://'); } else if(cmd==='foreColor'){ document.execCommand('foreColor',false,'#006C84'); } else { document.execCommand(cmd,false,null);} }catch(e){} } return; }
+    if(ev.target.closest('[data-eb-sig]')){ ev.preventDefault(); ev.stopPropagation(); var sb=document.querySelector('[data-em-body]'); if(sb){ sb.innerHTML+=sigBlock(); var ss=document.querySelector('[data-em-send]'); if(ss) ss.classList.add('on'); } return; }
+    if(ev.target.closest('[data-eb-design]')||ev.target.closest('[data-em-attach]')){ ev.preventDefault(); ev.stopPropagation(); return; }
+    if(ev.target.closest('[data-em-discard]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); return; }
+    var snd=ev.target.closest('[data-em-send]');
+    if(snd){ ev.preventDefault(); ev.stopPropagation(); if(!snd.classList.contains('on')) return; var en=snd.getAttribute('data-name')||'Lead'; var first=en.split(' ')[0]; var a=window.__kwiqApp; if(a&&a.kwiqMakeKwiq){ var m=document.querySelector('[data-kwiq-messages]'); if(m){ m.appendChild(a.kwiqMakeKwiq('Sent your email to '+en+'.')); m.scrollTop=m.scrollHeight; } } openSuccess(en, 'Your email to '+first+' is on its way.'); return; }
+    var pick=ev.target.closest('[data-sms-pick]');
+    if(pick){ ev.preventDefault(); ev.stopPropagation(); var pta=document.querySelector('[data-sms-body]'); if(pta){ pta.value=pick.getAttribute('data-sms-pick'); pta.dispatchEvent(new Event('input',{bubbles:true})); pta.focus(); } return; }
+    if(ev.target.closest('[data-sms-cancel]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); return; }
+    if(ev.target.closest('[data-sms-calc]')){ ev.preventDefault(); ev.stopPropagation(); return; }
+    var ssnd=ev.target.closest('[data-sms-send]');
+    if(ssnd){ ev.preventDefault(); ev.stopPropagation(); if(!ssnd.classList.contains('on')) return; var sn=ssnd.getAttribute('data-name')||'Lead'; var sf=sn.split(' ')[0]; var a2=window.__kwiqApp; if(a2&&a2.kwiqMakeKwiq){ var m2=document.querySelector('[data-kwiq-messages]'); if(m2){ m2.appendChild(a2.kwiqMakeKwiq('Sent your text to '+sn+'.')); m2.scrollTop=m2.scrollHeight; } } openSuccess(sn, 'Your text to '+sf+' is on its way.'); return; }
+    var cfr=ev.target.closest('[data-cf-radio]');
+    if(cfr){ ev.preventDefault(); var rs=cfr.parentNode.querySelectorAll('[data-cf-radio]'); for(var i=0;i<rs.length;i++) rs[i].classList.toggle('on', rs[i]===cfr); return; }
+    var cfk=ev.target.closest('[data-cf-check]');
+    if(cfk){ ev.preventDefault(); cfk.classList.toggle('on'); return; }
+    if(ev.target.closest('[data-cf-cancel]')){ ev.preventDefault(); ev.stopPropagation(); closePanel(); return; }
+    if(ev.target.closest('[data-cf-again]')){ ev.preventDefault(); ev.stopPropagation(); openPanel('Create Contact', contactFormHTML(), {noChip:true}); return; }
+    var cfc=ev.target.closest('[data-cf-create]');
+    if(cfc){ ev.preventDefault(); ev.stopPropagation(); var nameEl=document.querySelector('[data-cf-name]'); var fld=document.querySelector('[data-cf-namefield]'); var val=nameEl?(nameEl.value||'').trim():''; if(!val){ if(fld) fld.classList.add('error'); if(nameEl) nameEl.focus(); return; } var a3=window.__kwiqApp; if(a3&&a3.kwiqMakeKwiq){ var m3=document.querySelector('[data-kwiq-messages]'); if(m3){ m3.appendChild(a3.kwiqMakeKwiq('Created a new contact: '+val+'.')); m3.scrollTop=m3.scrollHeight; } } openContactSuccess(val); return; }
   },true);
   window.addEventListener('resize',function(){ var d=drawer(); if(d&&d.classList.contains('kwiq-has-panel')) setW(window.__kapW||500); });
 
@@ -1099,7 +1203,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     var dateStr=''; try{ dateStr=new Date().toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){}
     openPanel('You called '+(name||'Lead')+': Talked', summaryHTML(name||'Lead', dateStr), {noChip:true});
   }
-  function successHTML(name, done, goal){
+  function successHTML(name, done, goal, subtitle){
     var pct=Math.max(6, Math.min(100, Math.round(done/goal*100)));
     var left=Math.max(0, goal-done);
     var CHECK='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>';
@@ -1108,38 +1212,175 @@ document.addEventListener('DOMContentLoaded', async function() {
       + '<div class="kap-success-in">'
       +   '<div class="kap-badge">'+CHECK+'</div>'
       +   '<h3 class="kap-success-h">Nice work, '+agentName()+'!</h3>'
-      +   '<p class="kap-success-sub">Your call with '+name+' is logged to the timeline.</p>'
+      +   '<p class="kap-success-sub">'+(subtitle||('Your call with '+name+' is logged to the timeline.'))+'</p>'
       +   '<div class="kap-prog"><div class="kap-prog-top"><span>Today\u2019s follow-ups</span><span><b>'+done+'</b> of '+goal+'</span></div><div class="kap-prog-track"><span style="width:'+pct+'%"></span></div><p class="kap-prog-hint">'+hint+'</p></div>'
-      +   '<div class="kap-stats"><div><b>'+done+'</b><span>Calls today</span></div><div><b>2</b><span>Day streak</span></div><div><b>12m</b><span>Talk time</span></div></div>'
+      +   '<div class="kap-stats"><div><b>'+done+'</b><span>Touches today</span></div><div><b>2</b><span>Day streak</span></div><div><b>12m</b><span>Talk time</span></div></div>'
       +   '<button class="kap-addtl" data-kap-next>Next follow-up</button>'
       + '</div></div>';
   }
   function fireConfetti(el){
     if(!el) return;
-    var colors=['#006C84','#6730B4','#026E24','#EFC977','#E07256','#0F5EAD'];
     var W=el.clientWidth||420, H=el.clientHeight||620;
-    var cannons=[{x:W*0.14,dir:1},{x:W*0.86,dir:-1}];
-    for(var k=0;k<cannons.length;k++){
-      var c=cannons[k];
-      for(var i=0;i<30;i++){
-        var s=document.createElement('span');
-        var tx=c.dir*(40+Math.random()*(W*0.55));
-        var ty=-(H*0.45+Math.random()*H*0.4);
-        var r=(Math.random()*720-360);
-        var col=colors[(Math.random()*colors.length)|0];
-        var w=6+Math.random()*6;
-        s.style.cssText='left:'+c.x+'px;bottom:0;background:'+col+';width:'+w.toFixed(0)+'px;height:'+(w*1.5).toFixed(0)+'px;--tx:'+tx.toFixed(0)+'px;--ty:'+ty.toFixed(0)+'px;--r:'+r.toFixed(0)+'deg;animation-delay:'+((i%6)*30)+'ms;';
-        el.appendChild(s);
-      }
+    var dpr=Math.min(2, window.devicePixelRatio||1);
+    var canvas=document.createElement('canvas');
+    canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr);
+    canvas.style.cssText='width:100%;height:100%;display:block;';
+    el.innerHTML=''; el.appendChild(canvas);
+    var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+    var colors=['#FF5CA8','#CC00FF','#22D3EE','#3B82F6','#8B5CF6','#FB923C','#34D399','#EF4444','#C4B5FD','#FBBF24','#06B6D4','#006C84'];
+    var N=150, parts=[];
+    for(var i=0;i<N;i++){
+      var depth=0.42+Math.random()*0.58;
+      var strip=Math.random()<0.72;
+      var baseW=(strip?4:7)+Math.random()*4;
+      var baseH=strip?(10+Math.random()*14):baseW;
+      parts.push({ x:Math.random()*W, y:-20-Math.random()*H*0.7, vx:(Math.random()*40-20), vy:20+Math.random()*40, g:(520+Math.random()*280)*depth, rot:Math.random()*6.28, vrot:(Math.random()*6-3), flip:Math.random()*6.28, vflip:2+Math.random()*4, swayA:18+Math.random()*46, swayF:1+Math.random()*2, swayPh:Math.random()*6.28, w:baseW*depth, h:baseH*depth, depth:depth, color:colors[(Math.random()*colors.length)|0] });
     }
-    setTimeout(function(){ if(el) el.innerHTML=''; }, 1900);
+    var last=performance.now(), t0=last, raf;
+    function frame(now){
+      var dt=Math.min(0.05,(now-last)/1000); last=now; var t=(now-t0)/1000;
+      ctx.clearRect(0,0,W,H);
+      var alive=0;
+      for(var i=0;i<parts.length;i++){
+        var p=parts[i];
+        p.vy+=p.g*dt; p.y+=p.vy*dt;
+        p.x+=(p.vx+Math.sin(t*p.swayF+p.swayPh)*p.swayA)*dt;
+        p.rot+=p.vrot*dt; p.flip+=p.vflip*dt;
+        if(p.y> H+30) continue; alive++;
+        var fade= t>4.2 ? Math.max(0,1-(t-4.2)) : 1;
+        ctx.save();
+        ctx.globalAlpha=(0.5+0.5*p.depth)*fade;
+        ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+        var sy=Math.max(0.12,Math.abs(Math.cos(p.flip)));
+        ctx.fillStyle=p.color;
+        ctx.fillRect(-p.w/2, -(p.h*sy)/2, p.w, p.h*sy);
+        ctx.restore();
+      }
+      if(alive>0 && t<6.5) raf=requestAnimationFrame(frame); else { if(el) el.innerHTML=''; }
+    }
+    raf=requestAnimationFrame(frame);
   }
-  function openSuccess(name){
+  function openSuccess(name, subtitle){
     if(window.__kapDoneCount==null) window.__kapDoneCount=2;
     window.__kapDoneCount++;
-    openPanel('Nice work!', successHTML(name||'Lead', window.__kapDoneCount, 8), {noChip:true});
+    openPanel('Nice work!', successHTML(name||'Lead', window.__kapDoneCount, 8, subtitle), {noChip:true});
     fireConfetti(document.querySelector('[data-kap-confetti]'));
   }
+  var EB_CARET='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  var EB_ERASE='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6 5 5-4 4H8z"/><path d="M14 6l4 4"/><path d="M3 21h8"/></svg>';
+  var EB_UL='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="7" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="17" r="1"/><path d="M10 7h10M10 12h10M10 17h10"/></svg>';
+  var EB_OL='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 7h10M10 12h10M10 17h10"/><path d="M4 5l1-.5V9M4 12h2l-2 3h2"/></svg>';
+  var EB_ALIGN='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h12M4 18h16"/></svg>';
+  var EB_SMILE='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg>';
+  var EB_LINK='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>';
+  var EB_CLIP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-9 9a5 5 0 0 1-7-7l9-9a3.4 3.4 0 0 1 5 5l-9 9a1.8 1.8 0 0 1-2.6-2.6l8-8"/></svg>';
+  var EB_SIG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19c3 0 3-3 6-3s3 3 6 3"/><path d="M14 5l4 4L8 19l-4 1 1-4z"/></svg>';
+  var EB_DESIGN='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>';
+  var EB_UPLOAD='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>';
+  var EB_REFRESH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></svg>';
+  var CF_PLUS='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>';
+  var CF_CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>';
+  var CF_WARN='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 20h20L12 3z"/><rect x="11" y="9" width="2" height="5" fill="#fff"/><rect x="11" y="16" width="2" height="2" fill="#fff"/></svg>';
+  function ebToolbar(){
+    return '<span class="kap-eb-sel">Source Sans '+EB_CARET+'</span>'
+      + '<span class="kap-eb-sel">12 '+EB_CARET+'</span>'
+      + '<span class="kap-eb-sep"></span>'
+      + '<button class="kap-eb-btn" data-eb-cmd="bold" title="Bold" style="font-weight:800">B</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="italic" title="Italic" style="font-style:italic;font-weight:700">I</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="underline" title="Underline" style="text-decoration:underline;font-weight:700">U</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="foreColor" title="Text color">A</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="removeFormat" title="Clear formatting">'+EB_ERASE+'</button>'
+      + '<span class="kap-eb-sep"></span>'
+      + '<button class="kap-eb-btn" data-eb-cmd="insertUnorderedList" title="Bulleted list">'+EB_UL+'</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="insertOrderedList" title="Numbered list">'+EB_OL+'</button>'
+      + '<button class="kap-eb-btn" title="Align">'+EB_ALIGN+EB_CARET+'</button>'
+      + '<span class="kap-eb-sep"></span>'
+      + '<button class="kap-eb-btn" title="Merge field" style="font-weight:800;font-size:13px">{+}</button>'
+      + '<button class="kap-eb-btn" title="Emoji">'+EB_SMILE+'</button>'
+      + '<button class="kap-eb-btn" data-eb-cmd="__link" title="Insert link">'+EB_LINK+'</button>';
+  }
+  function sigBlock(){ return '<p style="color:#6c727e;font-size:13px;margin-top:16px;">—<br><b>'+agentName()+' Royals</b><br>Keller Williams · Licensed Real Estate Agent<br>(917) 123-9182</p>'; }
+  function emailBuilderHTML(name){
+    return '<div class="kap-em">'
+      + '<div class="kap-em-scroll">'
+      +   '<div class="kap-em-field"><span class="kap-em-label">From</span><div class="kap-em-from">'+agentName()+' Royals (agent2004436747@mailer.kw.com)</div></div>'
+      +   '<div class="kap-em-field"><span class="kap-em-label">To</span><div><span class="kap-em-chip">'+name+'</span></div></div>'
+      +   '<div class="kap-em-field"><span class="kap-em-label">Subject <b style="color:#CC0000">*</b></span><input class="kap-em-subject" data-em-subject type="text" placeholder=""></div>'
+      +   '<div class="kap-eb-toolbar">'+ebToolbar()+'</div>'
+      +   '<div class="kap-em-editor" data-em-body contenteditable="true" data-ph="Enter text…"></div>'
+      + '</div>'
+      + '<div class="kap-em-tools"><button class="kap-eb-act" data-em-attach>'+EB_CLIP+'Attach File</button><button class="kap-eb-act" data-eb-sig>'+EB_SIG+'Signature</button><button class="kap-eb-act" data-eb-design>'+EB_DESIGN+'Add Design</button></div>'
+      + '<div class="kap-em-foot"><span class="kap-em-quota">5,000 remaining emails &nbsp; <span class="kap-em-manage">Manage Monthly Subscription</span></span><span class="kap-em-foot-r"><button class="kap-em-discard" data-em-discard>Discard</button><button class="kap-em-send" data-em-send data-name="'+name+'">Send</button></span></div>'
+      + '</div>';
+  }
+  function smsBuilderHTML(name, phone){
+    var first=(name||'Lead').split(' ')[0];
+    return '<div class="kap-sms"><div class="kap-sms-scroll">'
+      + '<p class="kap-sms-intro">Send your contacts a text message from your Twilio number.</p>'
+      + '<p class="kap-em-label">Send to <b style="color:#CC0000">*</b></p>'
+      + '<div class="kap-sms-recip"><span class="kap-sms-name">*'+name+'</span><span class="kap-sms-phone">'+phone+' '+EB_CARET+'</span></div>'
+      + '<p class="kap-sms-note">* This list includes 1 new daily unique recipient. We recommend limiting messages to less than 200 unique users per day. <span class="kap-em-manage">Learn More</span></p>'
+      + '<div class="kap-sms-msghead"><span class="kap-em-label">Message <b style="color:#CC0000">*</b></span><span class="kap-sms-count" data-sms-count>0/160</span></div>'
+      + '<textarea class="kap-sms-ta" data-sms-body placeholder="Write your message…"></textarea>'
+      + '<p class="kap-sms-sugglbl">Suggested messages</p>'
+      + '<div class="kap-sms-sugg">'
+      +   '<button class="kap-sms-chip" data-sms-pick="Hey '+first+'! Great meeting you at the open house — let’s chat soon 😊">Open house follow-up</button>'
+      +   '<button class="kap-sms-chip" data-sms-pick="Hi '+first+', just checking in — are you still looking in the area? Happy to help however I can.">Checking in</button>'
+      +   '<button class="kap-sms-chip" data-sms-pick="Hi '+first+'! A couple of new listings just hit the market that match what you’re after. Want me to send them over?">New listings</button>'
+      +   '<button class="kap-sms-chip" data-sms-pick="Hi '+first+', thanks for your interest! When’s a good time for a quick call this week?">Book a call</button>'
+      + '</div>'
+      + '<div class="kap-sms-drop">'+EB_UPLOAD+'<b>Drop files here to upload or <span class="kap-em-manage">browse your files</span></b><small>A maximum of 5MB can be added to any MMS</small></div>'
+      + '<div class="kap-sms-acct">'
+      +   '<p class="kap-sms-h" style="margin-top:0">My Account Balance</p>'
+      +   '<div class="kap-sms-row"><span>Available credits</span><b>1,500</b></div>'
+      +   '<div class="kap-sms-row sub"><span>Monthly credit limit</span><span>1,500</span></div>'
+      +   '<p class="kap-em-manage" style="margin:8px 0 0;font-weight:700;cursor:pointer;">Manage Twilio Account</p>'
+      +   '<p class="kap-sms-h">Account Usage</p>'
+      +   '<div class="kap-sms-row"><span>SMS messages</span><b>1</b></div>'
+      +   '<div class="kap-sms-row sub"><span>+1 Country Code</span><span>1</span></div>'
+      +   '<div class="kap-sms-row sub"><span>Other Country Code</span><span>0</span></div>'
+      +   '<div class="kap-sms-row" style="margin-top:8px;"><span>TOTAL COST</span><button class="kap-sms-calc" data-sms-calc>'+EB_REFRESH+'Calculate Cost</button></div>'
+      +   '<p class="kap-sms-h">Daily Unique Recipients</p>'
+      +   '<div class="kap-sms-row"><span>Remaining today</span><b>200</b></div>'
+      +   '<div class="kap-sms-row sub"><span>Contacted today</span><span>0</span></div>'
+      +   '<div class="kap-sms-row sub"><span>Daily limit</span><span>200</span></div>'
+      + '</div>'
+      + '<p class="kap-sms-warn">WARNING! You must comply with the Telephone Consumer Protection Act (TCPA) and any other federal, state or local laws, including for B2B calls and texts. Never call or text a number on any Do Not Call list, and do not use an autodialer or artificial/prerecorded voice without proper consent.</p>'
+      + '</div>'
+      + '<div class="kap-em-foot"><span class="kap-em-quota"></span><span class="kap-em-foot-r"><button class="kap-em-discard" data-sms-cancel>Cancel</button><button class="kap-em-send" data-sms-send data-name="'+name+'">Verify &amp; Send</button></span></div>'
+      + '</div>';
+  }
+  function contactFormHTML(){
+    return '<div class="kap-cf"><div class="kap-cf-scroll">'
+      + '<div class="kap-cf-field" data-cf-namefield><span class="kap-cf-label"><span class="kap-cf-warn">'+CF_WARN+'</span>Full Name <span class="kap-cf-req">*</span></span><input class="kap-cf-input" data-cf-name type="text" placeholder=""><span class="kap-cf-err">Full Name is required</span></div>'
+      + '<button class="kap-cf-link">'+CF_PLUS+'Add Relationship</button>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Primary Email</span><div class="kap-cf-row"><input class="kap-cf-input" type="email" placeholder=""><span class="kap-cf-sel">Personal '+EB_CARET+'</span></div></div>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Primary Phone</span><div class="kap-cf-row"><span class="kap-cf-phone"><span style="font-size:16px">🇺🇸</span>'+EB_CARET+'<input type="tel" value="+1"></span><span class="kap-cf-sel">Personal '+EB_CARET+'</span></div></div>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Lead Source Type</span><div class="kap-cf-radios"><span class="kap-cf-radio on" data-cf-radio="list"><span class="kap-cf-dot"></span>Select From List</span><span class="kap-cf-radio" data-cf-radio="contacts"><span class="kap-cf-dot"></span>Select From Contacts</span></div></div>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Lead Source</span><span class="kap-cf-sel full">Select a lead source… '+EB_CARET+'</span></div>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Assignee and Lead Routing Options</span><span class="kap-cf-sel full" style="color:var(--label-primary,#282b33);font-weight:400;">'+agentName()+' Waldo '+EB_CARET+'</span></div>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Collaborators</span><span class="kap-cf-sel full">Select collaborators… '+EB_CARET+'</span></div>'
+      + '<span class="kap-cf-check" data-cf-check><span class="kap-cf-box">'+CF_CHECK+'</span>Mark as Lead</span>'
+      + '<div class="kap-cf-field"><span class="kap-cf-label">Tags</span><span class="kap-cf-sel full">Select as many as you want… '+EB_CARET+'</span></div>'
+      + '</div>'
+      + '<div class="kap-em-foot"><span class="kap-em-quota"></span><span class="kap-em-foot-r"><button class="kap-em-discard" data-cf-cancel>Cancel</button><button class="kap-em-send on" data-cf-create>Create Contact</button></span></div>'
+      + '</div>';
+  }
+  function contactSuccessHTML(name){
+    if(window.__kapDbCount==null) window.__kapDbCount=143;
+    window.__kapDbCount++;
+    var db=window.__kapDbCount, goal=200; var pct=Math.max(4, Math.min(100, Math.round(db/goal*100))); var left=Math.max(0, goal-db);
+    var CHECK='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>';
+    var hint = left>0 ? ('A healthy database has 200+ contacts. You’re '+left+' away — great momentum, keep building! 🌱') : ('You’ve built a healthy 200+ contact database — outstanding! 🎉');
+    return '<div class="kap-success"><div class="kap-success-in">'
+      + '<div class="kap-badge">'+CHECK+'</div>'
+      + '<h3 class="kap-success-h">Contact created!</h3>'
+      + '<p class="kap-success-sub">You added <b>'+name+'</b> to your database.</p>'
+      + '<div class="kap-prog"><div class="kap-prog-top"><span>Database growth</span><span><b>'+db+'</b> of 200</span></div><div class="kap-prog-track"><span style="width:'+pct+'%"></span></div><p class="kap-prog-hint">'+hint+'</p></div>'
+      + '<button class="kap-addtl" data-cf-again>Add another contact</button>'
+      + '</div></div>';
+  }
+  function openContactSuccess(name){ openPanel('Nice work!', contactSuccessHTML(name||'contact'), {noChip:true}); }
   function slide(inner,cls){ return '<div class="kap-slide '+(cls||'')+'">'+inner+'</div>'; }
   function presentationHTML(){
     var n=agentName()+' Royals';
@@ -1172,7 +1413,13 @@ document.addEventListener('DOMContentLoaded', async function() {
   window.__kapClose = closePanel;
   window.__kwiqArtifact = function(text, instance){
     var t=(text||'').toLowerCase();
-    var isCreate=/\b(create|make|build|design|draft|put together|generate|prepare)\b/.test(t);
+    var isCreate=/\b(create|make|build|design|draft|put together|generate|prepare|new|add)\b/.test(t);
+    if(isCreate && /\b(contact|lead)\b/.test(t)){
+      if(instance && typeof instance.kwiqEnterChat==='function') instance.kwiqEnterChat();
+      if(instance && typeof instance.kwiqMakeKwiq==='function'){ var mc=document.querySelector('[data-kwiq-messages]'); if(mc){ mc.appendChild(instance.kwiqMakeKwiq('Opening a new contact form — fill in the details on the right and hit Create Contact.')); mc.scrollTop=mc.scrollHeight; } }
+      setTimeout(function(){ openPanel('Create Contact', contactFormHTML(), {noChip:true}); }, 240);
+      return true;
+    }
     var type=null, title=null, msg=null;
     if(/listing presentation|listing deck|pitch deck|presentation|slide deck|\bdeck\b|\bslides\b/.test(t)){ type='pres'; title='Listing Presentation'; msg='Starting your listing presentation — you can watch it come together on the right, resize the panel, and keep chatting here on the left.'; }
     else if(/\bcma\b|comparative market|market analysis/.test(t)){ type='cma'; title='Comparative Market Analysis'; msg='Pulling your CMA together on the right — resize the panel anytime, and keep chatting on the left.'; }
