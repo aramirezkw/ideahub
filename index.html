@@ -176,6 +176,8 @@
     height: 34px; padding: 0 var(--space-4); border-radius: 999px; cursor: pointer; white-space: nowrap;
     transition: background .25s var(--ease), color .25s var(--ease); }
   .segmented button:hover { color: var(--label-primary); }
+  .segmented button:disabled { opacity: .4; cursor: not-allowed; }
+  .segmented button:disabled:hover { color: var(--label-secondary); }
   .segmented button.active { background: var(--system-action); color: var(--label-inverse); }
   .persona .count { font-size: var(--fs-text12); line-height: var(--lh-text12); color: var(--label-tertiary); }
 
@@ -273,7 +275,7 @@
     <div class="persona-bar reveal">
       <div class="segmented" role="tablist" aria-label="Audience">
         <button id="seg-solo" class="active" role="tab" aria-selected="true" data-persona="solo">Solo Agent</button>
-        <button id="seg-mc" role="tab" aria-selected="false" data-persona="mc">MC Leader</button>
+        <button id="seg-mc" role="tab" aria-selected="false" data-persona="mc" disabled title="Coming soon">MC Leader</button>
       </div>
     </div>
 
@@ -303,7 +305,7 @@
       title: "KWIQ Overlay",
       desc: "An AI overlay you step into. It opens above Command, dimming the dashboard for a focused, full-canvas session.",
       chips: ["Overlay", "Full canvas", "Focused"],
-      href: "agent_overlay.html",
+      href: "agent_overlay copy.html",
       persona: ["solo"],
       triggerAI: true,
       action: "var(--system-action)", tint: "var(--system-tinted)"
@@ -323,7 +325,7 @@
       title: "KWIQ Copilot v2",
       desc: "The next iteration of the docked copilot — refined layout, faster hand-offs, and tighter Command integration.",
       chips: ["Side panel", "Iteration", "Refined"],
-      href: "agent_copilot_v2.html",
+      href: "agent_copilot_overlay.html",
       persona: ["solo"],
       triggerAI: true,
       action: "var(--green-action)", tint: "var(--green-tinted)"

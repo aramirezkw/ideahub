@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadCallCard — Progressive Disclosure · XDS</title>
+<!--
+  PROGRESSIVE DISCLOSURE MODEL
+  ─ Tier 1 · Collapsed (default) ─
+    avatar + name + context meta + ONE lead signal chip + compressed KWIQ reason (1 line, truncates)
+    + primary call button + chevron. The action is NEVER behind the disclosure.
+  ─ Tier 2 · Expanded (click header/chevron) ─
+    full chip set + full KWIQ synthesis + suggested opener w/ drafted actions + secondary/tertiary actions
+  ─ Tier 3 · Linked out ─
+    "View contact" → full record. Not simulated here.
+  Chip precedence for the collapsed slot: urgency/decay (orange) > model score (purple) > strongest fact.
+  A11y: header row is a button with aria-expanded; expansion animates max-height + opacity, respects reduced motion.
+  XDS tokens identical to leadcallcard-lifecycle-states.html.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+  :root {
+    --system-action:#006C84; --system-container-tinted:#D5F7FF; --system-container-tinted-inverse:#006C84;
+    --neutral-label-primary:#282B33; --neutral-label-secondary:#3D424D; --neutral-label-tertiary:#6C727E;
+    --neutral-label-inverse:#FFFFFF; --neutral-page-background:#F7F7F8; --neutral-container-background:#FFFFFF;
+    --neutral-container-tinted:#E4E5E7; --neutral-divider:rgba(43,43,51,0.1);
+    --purple-action:#6730B4; --purple-container-tinted:#EFE8FB;
+    --green-action:#026E24; --green-container-tinted:#D6F2DF;
+    --yellow-action:#995E00; --yellow-container-tinted:#FFEDC9;
+    --blue-action:#0F5EAD; --blue-container-tinted:#D9EFFF;
+    --orange-action:#A73B06; --orange-container-tinted:#FEDFCF;
+    --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
+    --shadow-12:0 4px 12px rgba(43,43,51,0.10);
+  }
+  * { box-sizing:border-box; }
+  body, * { font-family:'Mulish',sans-serif; }
+  body { margin:0; background:var(--neutral-page-background); color:var(--neutral-label-primary); padding:var(--space-8) var(--space-4) 64px; }
+  .wrap { max-width:640px; margin:0 auto; }
+  .page-title { font-size:24px; line-height:32px; font-weight:800; margin:0 0 var(--space-2); }
+  .page-sub { font-size:14px; line-height:20px; color:var(--neutral-label-secondary); margin:0 0 var(--space-6); }
+
+  .feed-label { font-size:12px; line-height:16px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:var(--neutral-label-tertiary); margin:0 0 var(--space-3); }
+
+  .card { background:var(--neutral-container-background); border-radius:8px; box-shadow:var(--shadow-12); margin-bottom:var(--space-3); overflow:hidden; }
+
+  /* ─── Collapsed header row ─── */
+  .card-head {
+    display:flex; align-items:center; gap:var(--space-3);
+    width:100%; text-align:left;
+    background:none; border:none; padding:var(--space-4); margin:0;
+    cursor:pointer; font-family:'Mulish',sans-serif;
+  }
+  .card-head:hover { background:rgba(0,108,132,0.04); }
+  .avatar { width:40px; height:40px; border-radius:50%; background:var(--system-container-tinted-inverse); color:var(--neutral-label-inverse); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; }
+  .head-main { flex:1; min-width:0; }
+  .head-top { display:flex; align-items:center; gap:var(--space-2); }
+  .name { font-size:14px; line-height:20px; font-weight:700; margin:0; color:var(--neutral-label-primary); }
+  .chip { display:inline-flex; align-items:center; gap:var(--space-1); padding:1px 8px; border-radius:12px; font-size:10px; line-height:14px; font-weight:700; white-space:nowrap; }
+  .chip.md { padding:2px 8px; font-size:12px; line-height:16px; }
+  .chip.green  { background:var(--green-container-tinted);  color:var(--green-action); }
+  .chip.yellow { background:var(--yellow-container-tinted); color:var(--yellow-action); }
+  .chip.blue   { background:var(--blue-container-tinted);   color:var(--blue-action); }
+  .chip.orange { background:var(--orange-container-tinted); color:var(--orange-action); }
+  .chip.purple { background:var(--purple-container-tinted); color:var(--purple-action); }
+  .chip.neutral{ background:var(--neutral-container-tinted); color:var(--neutral-label-secondary); }
+  .reason {
+    font-size:12px; line-height:16px; color:var(--neutral-label-tertiary);
+    margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .head-actions { display:flex; align-items:center; gap:var(--space-2); flex-shrink:0; }
+  .chevron { transition:transform .2s ease; color:var(--neutral-label-tertiary); display:flex; }
+  .card.open .chevron { transform:rotate(180deg); }
+
+  /* ─── Expanded body ─── */
+  .card-body {
+    max-height:0; opacity:0; overflow:hidden;
+    transition:max-height .28s ease, opacity .22s ease;
+  }
+  .card.open .card-body { max-height:520px; opacity:1; }
+  @media (prefers-reduced-motion: reduce) {
+    .card-body, .chevron { transition:none; }
+  }
+  .card-body-inner { padding:0 var(--space-4) var(--space-4); border-top:1px solid var(--neutral-divider); padding-top:var(--space-3); }
+  .chips { display:flex; flex-wrap:wrap; gap:var(--space-2); margin-bottom:var(--space-3); }
+  .chip .info { opacity:.7; }
+  .body-text { font-size:14px; line-height:20px; color:var(--neutral-label-secondary); margin:0; }
+  .synth { display:flex; gap:var(--space-2); margin-bottom:var(--space-3); align-items:flex-start; }
+  .synth svg { flex-shrink:0; margin-top:3px; }
+  .eyebrow { font-size:10px; line-height:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin:0 0 var(--space-1); color:var(--purple-action); }
+  .opener { background:var(--purple-container-tinted); border-radius:6px; padding:var(--space-3) var(--space-4); margin-bottom:var(--space-3); }
+  .opener .links { display:flex; gap:var(--space-3); margin-top:var(--space-2); }
+  .footer { display:flex; gap:var(--space-2); justify-content:space-between; align-items:center; }
+  .row { display:flex; align-items:center; gap:var(--space-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page-title">LeadCallCard — Progressive Disclosure</h1>
+  <p class="page-sub">Collapsed by default: person, one signal, one compressed reason, and the call button — the action never hides behind the disclosure. Click a card (or its chevron) to expand into evidence, full synthesis, and the drafted opener. Try the whole feed to feel the scan rhythm.</p>
+
+  <p class="feed-label">Today's calls · 4</p>
+
+  <!-- ═══ CARD 1 · New lead (urgency chip wins the collapsed slot) ═══ -->
+  <div class="card" id="card-jasmine">
+    <button class="card-head" aria-expanded="false" aria-controls="body-jasmine" onclick="toggleCard('card-jasmine', this)">
+      <div class="avatar">JT</div>
+      <div class="head-main">
+        <div class="head-top">
+          <p class="name">Jasmine Torres</p>
+          <span class="chip orange">Respond in first hour</span>
+        </div>
+        <p class="reason">New KW.com inquiry, 14 min ago — first agent to call usually wins</p>
+      </div>
+      <div class="head-actions">
+        <span role="button" aria-label="Call Jasmine" onclick="event.stopPropagation()" style="background:#006C84;color:#FFFFFF;border:none;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 16px;height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Call
+        </span>
+        <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </button>
+    <div class="card-body" id="body-jasmine">
+      <div class="card-body-inner">
+        <div class="chips">
+          <span class="chip md orange">Respond in first hour <span class="info">ⓘ</span></span>
+          <span class="chip md blue">Inquired: 4821 Noble Ave <span class="info">ⓘ</span></span>
+          <span class="chip md blue">Flagged home shopper <span class="info">ⓘ</span></span>
+        </div>
+        <div class="synth">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" fill="#6730B4"/></svg>
+          <p class="body-text" style="color:var(--neutral-label-primary);"><strong style="color:var(--purple-action);">KWIQ:</strong> Jasmine asked about a $749k listing 14 minutes ago — leads contacted in the first hour convert several times better. Not much else is known yet; the goal of this call is simply to be first and learn what she's looking for.</p>
+        </div>
+        <div class="opener">
+          <p class="eyebrow">Suggested opener</p>
+          <p class="body-text" style="color:var(--neutral-label-primary);">&ldquo;Hi Jasmine, this is [Agent] with Keller Williams — I saw you asked about the Noble Ave home. It's a great one. Is that the area you're focused on?&rdquo;</p>
+          <div class="links">
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Try another</button>
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="row">
+            <button style="background:transparent;color:#006C84;border:1.5px solid #006C84;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 20px;height:36px;cursor:pointer;">Text Instead</button>
+            <button style="background:none;border:none;color:#006C84;border-radius:0;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0;cursor:pointer;">Can't now — start SmartPlan</button>
+          </div>
+          <button style="background:none;border:none;color:#6C727E;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">View contact</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CARD 2 · Active buyer (model score wins the collapsed slot) ═══ -->
+  <div class="card" id="card-maya">
+    <button class="card-head" aria-expanded="false" aria-controls="body-maya" onclick="toggleCard('card-maya', this)">
+      <div class="avatar" style="background:#3D424D;">MR</div>
+      <div class="head-main">
+        <div class="head-top">
+          <p class="name">Maya Rivas</p>
+          <span class="chip purple">Buy propensity 921</span>
+        </div>
+        <p class="reason">Search activity tripled this week — 2 new matches hit the market yesterday</p>
+      </div>
+      <div class="head-actions">
+        <span role="button" aria-label="Call Maya" onclick="event.stopPropagation()" style="background:#006C84;color:#FFFFFF;border:none;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 16px;height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Call
+        </span>
+        <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </button>
+    <div class="card-body" id="body-maya">
+      <div class="card-body-inner">
+        <div class="chips">
+          <span class="chip md blue">Viewed 12 listings this week <span class="info">ⓘ</span></span>
+          <span class="chip md green">Pre-approved $850k <span class="info">ⓘ</span></span>
+          <span class="chip md yellow">Saved search: 3BR + yard <span class="info">ⓘ</span></span>
+          <span class="chip md purple">Buy propensity 921 <span class="info">ⓘ</span></span>
+        </div>
+        <div class="synth">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" fill="#6730B4"/></svg>
+          <p class="body-text" style="color:var(--neutral-label-primary);"><strong style="color:var(--purple-action);">KWIQ:</strong> Maya's search activity tripled this week and two homes matching her saved search hit the market yesterday. A call while they're fresh keeps you ahead of the weekend open houses.</p>
+        </div>
+        <div class="opener">
+          <p class="eyebrow">Suggested opener</p>
+          <p class="body-text" style="color:var(--neutral-label-primary);">&ldquo;Hi Maya! Two new listings just came up that fit your 3-bedroom-with-a-yard search — want me to get us in before the weekend open houses?&rdquo;</p>
+          <div class="links">
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Try another</button>
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="row">
+            <button style="background:transparent;color:#006C84;border:1.5px solid #006C84;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 20px;height:36px;cursor:pointer;">Send the 2 Listings</button>
+          </div>
+          <button style="background:none;border:none;color:#6C727E;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">View contact</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CARD 3 · Likely seller ═══ -->
+  <div class="card" id="card-diane">
+    <button class="card-head" aria-expanded="false" aria-controls="body-diane" onclick="toggleCard('card-diane', this)">
+      <div class="avatar">DF</div>
+      <div class="head-main">
+        <div class="head-top">
+          <p class="name">Diane Foster</p>
+          <span class="chip purple">List propensity 912</span>
+        </div>
+        <p class="reason">Deep equity, 7 yrs in home, values up 9% — fits the listing-within-a-year profile</p>
+      </div>
+      <div class="head-actions">
+        <span role="button" aria-label="Call Diane" onclick="event.stopPropagation()" style="background:#006C84;color:#FFFFFF;border:none;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 16px;height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Call
+        </span>
+        <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </button>
+    <div class="card-body" id="body-diane">
+      <div class="card-body-inner">
+        <div class="chips">
+          <span class="chip md green">&gt;50% equity · est. $580k <span class="info">ⓘ</span></span>
+          <span class="chip md yellow">7 yrs in home <span class="info">ⓘ</span></span>
+          <span class="chip md blue">Est. value $1.1M, +9% YoY <span class="info">ⓘ</span></span>
+          <span class="chip md purple">List propensity 912 <span class="info">ⓘ</span></span>
+        </div>
+        <div class="synth">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" fill="#6730B4"/></svg>
+          <p class="body-text" style="color:var(--neutral-label-primary);"><strong style="color:var(--purple-action);">KWIQ:</strong> Diane fits the profile of homeowners who list within the year — deep equity, seven years in, rising values on her street. She hasn't heard from you since August; a market update is a natural way back in.</p>
+        </div>
+        <div class="opener">
+          <p class="eyebrow">Suggested opener</p>
+          <p class="body-text" style="color:var(--neutral-label-primary);">&ldquo;Hi Diane, it's been a while! Homes near you are selling for quite a bit more than when you bought — want me to send over what yours might look like in this market?&rdquo;</p>
+          <div class="links">
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Try another</button>
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="row">
+            <button style="background:transparent;color:#006C84;border:1.5px solid #006C84;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 20px;height:36px;cursor:pointer;">Send a CMA First</button>
+          </div>
+          <div class="row">
+            <button style="background:none;border:none;color:#6C727E;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Data sources</button>
+            <button style="background:none;border:none;color:#6C727E;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">View contact</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CARD 4 · Going cold (decay chip wins the collapsed slot) ═══ -->
+  <div class="card" id="card-ben">
+    <button class="card-head" aria-expanded="false" aria-controls="body-ben" onclick="toggleCard('card-ben', this)">
+      <div class="avatar" style="background:#3D424D;">BW</div>
+      <div class="head-main">
+        <div class="head-top">
+          <p class="name">Ben Whitfield</p>
+          <span class="chip orange">47 days since contact</span>
+        </div>
+        <p class="reason">Was touring in May, went quiet — a call with something new beats a 4th text</p>
+      </div>
+      <div class="head-actions">
+        <span role="button" aria-label="Call Ben" onclick="event.stopPropagation()" style="background:#006C84;color:#FFFFFF;border:none;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 16px;height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Call
+        </span>
+        <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </button>
+    <div class="card-body" id="body-ben">
+      <div class="card-body-inner">
+        <div class="chips">
+          <span class="chip md orange">47 days since contact <span class="info">ⓘ</span></span>
+          <span class="chip md yellow">3 unanswered texts <span class="info">ⓘ</span></span>
+          <span class="chip md neutral">Toured 5 homes in May <span class="info">ⓘ</span></span>
+          <span class="chip md yellow">Search activity paused <span class="info">ⓘ</span></span>
+        </div>
+        <div class="synth">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" fill="#6730B4"/></svg>
+          <p class="body-text" style="color:var(--neutral-label-primary);"><strong style="color:var(--purple-action);">KWIQ:</strong> Ben went quiet after his last tour and hasn't answered texts. A low-pressure call with a fresh reason to talk works better here than another follow-up text.</p>
+        </div>
+        <div class="opener">
+          <p class="eyebrow">Suggested opener</p>
+          <p class="body-text" style="color:var(--neutral-label-primary);">&ldquo;Hey Ben, no pressure at all — I know house hunting can take a back seat. A couple of places came up that made me think of your list. Want me to keep an eye out, or pause for now?&rdquo;</p>
+          <div class="links">
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Try another</button>
+            <button style="background:none;border:none;color:#6730B4;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="row">
+            <button style="background:transparent;color:#006C84;border:1.5px solid #006C84;border-radius:4px;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0 20px;height:36px;cursor:pointer;">Move to Nurture</button>
+            <button style="background:none;border:none;color:#006C84;border-radius:0;font-family:'Mulish',sans-serif;font-size:14px;font-weight:700;padding:0;cursor:pointer;">Dismiss</button>
+          </div>
+          <button style="background:none;border:none;color:#6C727E;border-radius:0;font-family:'Mulish',sans-serif;font-size:12px;font-weight:700;padding:0;cursor:pointer;">View contact</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleCard(cardId, headBtn) {
+  const card = document.getElementById(cardId);
+  const isOpen = card.classList.toggle('open');
+  headBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+</script>
+</body>
+</html>
