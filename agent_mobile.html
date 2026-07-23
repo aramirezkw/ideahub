@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command — Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-sans: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --fw-regular: 400; --fw-medium: 600; --fw-bold: 700; --fw-black: 800;
+    --action: #006C84; --action-hover: #005568; --tint: #e9f6fa;
+    --label-primary: #282b33; --label-secondary: #5b6672; --label-tertiary: #8a97a0;
+    --page-bg: #f4f6f7; --container-bg: #ffffff; --container-tinted: #f2f6f7;
+    --divider: #e7ebee; --outline: #d8dee2;
+    --r: 12px; --r-sm: 8px; --r-lg: 16px; --r-full: 999px;
+    --shadow-menu: 0 18px 50px rgba(8,30,40,.18), 0 2px 8px rgba(8,30,40,.08);
+    --shadow-input: 0 6px 20px rgba(8,30,40,.08), 0 1px 3px rgba(8,30,40,.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #12556a 0%, rgba(18,85,106,0) 60%),
+      linear-gradient(160deg, #0b3a4a 0%, #072731 100%);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 32px 16px;
+  }
+
+  /* ---- Phone mockup ---- */
+  .phone {
+    position: relative; width: 390px; height: 844px; flex: none;
+    background: #0a0d0f; border-radius: 56px;
+    padding: 13px;
+    box-shadow: 0 2px 0 2px #1c2226 inset, 0 50px 120px rgba(0,0,0,.55), 0 12px 32px rgba(0,0,0,.4);
+  }
+  .phone::after { /* side buttons */
+    content: ""; position: absolute; left: -2px; top: 190px; width: 3px; height: 64px;
+    background: #1c2226; border-radius: 3px;
+    box-shadow: 0 84px 0 #1c2226, 0 -104px 0 0 #1c2226;
+  }
+  .screen {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    border-radius: 44px; background: var(--page-bg);
+    display: flex; flex-direction: column;
+  }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 34px; background: #0a0d0f; border-radius: 20px; z-index: 60;
+  }
+
+  /* ---- Status bar ---- */
+  .statusbar {
+    height: 52px; flex: none; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 6px; font-weight: var(--fw-bold); color: var(--label-primary); font-size: 15px;
+  }
+  .statusbar .icons { display: flex; align-items: center; gap: 6px; }
+  .statusbar svg { display: block; }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    height: 52px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand .kw { width: 30px; height: 30px; border-radius: 2px; display: block; }
+  .brand .name { font-weight: var(--fw-black); font-size: 17px; color: var(--label-primary); }
+  .iconbtn {
+    width: 38px; height: 38px; border-radius: var(--r-full); border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center; color: var(--label-secondary); cursor: pointer;
+  }
+  .iconbtn:active { background: var(--container-tinted); }
+
+  /* ---- Greeting ---- */
+  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; padding: 12px 26px 0; }
+  .spark { color: var(--action); margin-bottom: 14px; }
+  .hello { font-weight: var(--fw-black); font-size: 27px; line-height: 33px; color: var(--label-primary); letter-spacing: -.3px; }
+  .sub { font-weight: var(--fw-regular); font-size: 15px; line-height: 22px; color: var(--label-secondary); margin-top: 12px; max-width: 300px; }
+
+  /* ---- Scrim ---- */
+  .scrim {
+    position: absolute; inset: 0; background: rgba(10,26,33,.28); z-index: 20;
+    opacity: 0; pointer-events: none; transition: opacity .24s ease;
+  }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+
+  /* ---- Bottom dock ---- */
+  .dock { flex: none; padding: 8px 16px 10px; position: relative; z-index: 30; }
+
+  .chipsWrap { position: relative; }
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 12px; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; white-space: nowrap; background: var(--container-bg); border: 1px solid var(--divider);
+    border-radius: var(--r-full); padding: 9px 15px; cursor: pointer;
+    font: var(--fw-bold) 13.5px/18px var(--font-sans); color: var(--label-secondary);
+    transition: background .14s, border-color .14s, color .14s;
+  }
+  .chip:active { background: var(--container-tinted); }
+
+  /* ---- Prompt-suggestion menu (opens over the chips) ---- */
+  .menu {
+    position: absolute; left: 0; right: 0; bottom: 12px; z-index: 40;
+    border-radius: var(--r-lg); box-shadow: var(--shadow-menu); overflow: hidden;
+    background: var(--container-bg); border: 1px solid var(--divider);
+    opacity: 0; transform: translateY(10px); pointer-events: none; visibility: hidden;
+    transition: opacity .22s ease, transform .26s cubic-bezier(.16,1,.3,1);
+  }
+  .menu.on { opacity: 1; transform: translateY(0); pointer-events: auto; visibility: visible; }
+  .menu-head {
+    display: flex; align-items: center; justify-content: space-between; padding: 15px 16px 12px;
+  }
+  .menu-title { font: var(--fw-bold) 14px/18px var(--font-sans); color: var(--label-tertiary); }
+  .menu-close {
+    width: 30px; height: 30px; border-radius: var(--r-sm); border: none; background: transparent;
+    color: var(--label-tertiary); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .menu-close:active { background: var(--container-tinted); color: var(--label-secondary); }
+  .menu-item {
+    display: block; width: 100%; text-align: left; background: transparent; border: none;
+    border-top: 1px solid var(--divider); padding: 15px 16px; cursor: pointer;
+    font: var(--fw-regular) 15.5px/21px var(--font-sans); color: var(--label-primary);
+    transition: background .12s ease;
+  }
+  .menu-item:active { background: var(--container-tinted); }
+
+  /* ---- Composer ---- */
+  .composer {
+    background: var(--container-bg); border: 1.5px solid var(--action); border-radius: 4px;
+    box-shadow: 0 0 0 3px rgba(0,108,132,.10), var(--shadow-input); padding: 14px 16px 10px;
+  }
+  .inputwrap { position: relative; display: flex; align-items: center; }
+  .caret {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 22px; background: var(--action); border-radius: 1px;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .inputwrap.filled .caret { display: none; }
+  .composer input {
+    width: 100%; border: none; outline: none; background: transparent; padding-left: 8px;
+    font: var(--fw-regular) 16px/22px var(--font-sans); color: var(--label-primary);
+  }
+  .composer input::placeholder { color: var(--label-tertiary); }
+
+  /* ---- iOS keyboard ---- */
+  .keyboard { flex: none; background: #d1d4da; padding: 6px 3px 0; user-select: none; position: relative; z-index: 30; }
+  .kb-predict { height: 42px; display: flex; align-items: stretch; }
+  .kb-pred { flex: 1; display: flex; align-items: center; justify-content: center; position: relative;
+    font: var(--fw-medium) 16px/1 var(--font-sans); color: #000; }
+  .kb-pred + .kb-pred::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 1px; background: rgba(0,0,0,.16); }
+  .kb-rows { display: flex; flex-direction: column; gap: 11px; }
+  .kb-row { display: flex; justify-content: center; gap: 6px; }
+  .kb-row.r2 { padding: 0 16px; }
+  .key {
+    height: 42px; flex: 1; background: #fff; border: none; border-radius: 5px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.3); color: #000; cursor: pointer;
+    font: var(--fw-regular) 22px/1 var(--font-sans); display: flex; align-items: center; justify-content: center;
+  }
+  .key:active { background: #d6dae0; }
+  .key.fn { background: #a9adb6; flex: none; min-width: 42px; font-size: 15px; }
+  .key.wide { flex: none; }
+  .key.k123 { min-width: 46px; }
+  .key.space { font-size: 16px; }
+  .key.return { min-width: 92px; font-size: 16px; }
+  .kb-home { height: 22px; position: relative; }
+  .kb-home::after { content: ""; position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    width: 140px; height: 5px; border-radius: 3px; background: #000; }
+  .composer .row {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 10px;
+  }
+  .composer .left, .composer .right { display: flex; align-items: center; gap: 4px; }
+  .round {
+    width: 36px; height: 36px; border-radius: var(--r-full); border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center; color: var(--label-secondary); cursor: pointer;
+  }
+  .round:active { background: var(--container-tinted); }
+  .model {
+    display: inline-flex; align-items: center; gap: 4px; border: none; background: transparent; cursor: pointer;
+    font: var(--fw-bold) 13.5px/1 var(--font-sans); color: var(--label-secondary); padding: 8px 6px;
+  }
+  .send {
+    width: 40px; height: 40px; border-radius: 14px; border: none; cursor: pointer;
+    background: var(--action); color: #fff; display: flex; align-items: center; justify-content: center;
+    transition: transform .12s ease, background .12s ease, opacity .12s ease; opacity: .45;
+  }
+  .send.active { opacity: 1; }
+  .send:active { transform: scale(.94); background: var(--action-hover); }
+
+  .caption { position: fixed; bottom: 18px; left: 0; right: 0; text-align: center;
+    color: rgba(255,255,255,.5); font: var(--fw-medium) 12px/1 var(--font-sans); letter-spacing: .2px; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="island"></div>
+    <div class="screen">
+      <!-- status bar -->
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4.5" width="3" height="7.5" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 4.2C3.1 2.2 5.7 1 8.5 1S13.9 2.2 16 4.2M3.4 6.7C4.8 5.4 6.6 4.6 8.5 4.6s3.7.8 5.1 2.1M5.9 9.2c.7-.7 1.6-1.1 2.6-1.1s1.9.4 2.6 1.1"/><circle cx="8.5" cy="11" r=".6" fill="currentColor" stroke="none"/></svg>
+          <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="16" height="7" rx="1.5" fill="currentColor"/><rect x="23.5" y="4.5" width="1.6" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+        </span>
+      </div>
+
+      <!-- top bar -->
+      <div class="topbar">
+        <div class="brand">
+          <img class="kw" src="assets/kwLogo.svg" width="30" height="30" alt="KW">
+          <span class="name">Command</span>
+        </div>
+        <button class="iconbtn" aria-label="Recent">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>
+        </button>
+      </div>
+
+      <!-- greeting -->
+      <div class="body">
+        <img class="spark" src="assets/sparkleIcon.svg" width="46" height="46" alt="">
+        <div class="hello">Ready to grow<br>your business?</div>
+      </div>
+
+      <!-- bottom dock -->
+      <div class="dock">
+        <div class="chips" data-chips></div>
+
+        <div class="composer">
+          <div class="inputwrap" data-inputwrap>
+            <span class="caret"></span>
+            <input data-input type="text" placeholder="Ask anything">
+          </div>
+          <div class="row">
+            <div class="left">
+              <button class="round" aria-label="Add">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+            <div class="right">
+              <button class="model">KWIQ Flash
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <button class="round" aria-label="Voice">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>
+              </button>
+              <button class="send" data-send aria-label="Send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- iOS keyboard -->
+      <div class="keyboard">
+        <div class="kb-predict">
+          <span class="kb-pred">Draft</span>
+          <span class="kb-pred">Write</span>
+          <span class="kb-pred">Generate</span>
+        </div>
+        <div class="kb-rows" data-keys>
+          <div class="kb-row">
+            <button class="key">q</button><button class="key">w</button><button class="key">e</button><button class="key">r</button><button class="key">t</button><button class="key">y</button><button class="key">u</button><button class="key">i</button><button class="key">o</button><button class="key">p</button>
+          </div>
+          <div class="kb-row r2">
+            <button class="key">a</button><button class="key">s</button><button class="key">d</button><button class="key">f</button><button class="key">g</button><button class="key">h</button><button class="key">j</button><button class="key">k</button><button class="key">l</button>
+          </div>
+          <div class="kb-row">
+            <button class="key fn" data-shift aria-label="Shift">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l7 8h-4v6H9v-6H5l7-8z"/></svg>
+            </button>
+            <button class="key">z</button><button class="key">x</button><button class="key">c</button><button class="key">v</button><button class="key">b</button><button class="key">n</button><button class="key">m</button>
+            <button class="key fn" data-back aria-label="Backspace">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H8L2 12l6 7h13a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M16 9l-5 6M11 9l5 6"/></svg>
+            </button>
+          </div>
+          <div class="kb-row">
+            <button class="key fn wide k123">123</button>
+            <button class="key fn" aria-label="Emoji">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+            </button>
+            <button class="key space" data-space>space</button>
+            <button class="key fn wide return">return</button>
+          </div>
+        </div>
+        <div class="kb-home"></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">Command · mobile prototype</div>
+
+<script>
+(function () {
+  var PROMPTS = [
+    'Summarize my pipeline',
+    'Find contacts to call today',
+    'Draft a listing description',
+    'Generate social post for a listing',
+    'Follow up with leads',
+    'Write a market update email',
+    'Analyze a recent comp',
+    'Create a SmartPlan'
+  ];
+
+  var chipsEl = document.querySelector('[data-chips]');
+  var inputEl = document.querySelector('[data-input]');
+  var sendEl = document.querySelector('[data-send]');
+  var wrapEl = document.querySelector('[data-inputwrap]');
+
+  // build chips
+  PROMPTS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.type = 'button';
+    b.textContent = p;
+    b.addEventListener('click', function () { choose(p); });
+    chipsEl.appendChild(b);
+  });
+
+  function refreshInput() {
+    var v = inputEl.value;
+    sendEl.classList.toggle('active', v.trim().length >= 2);
+    wrapEl.classList.toggle('filled', v.length > 0);
+  }
+
+  function choose(prompt) {
+    inputEl.value = prompt;
+    refreshInput();
+  }
+
+  inputEl.addEventListener('input', refreshInput);
+
+  // Keyboard typing
+  document.querySelector('[data-keys]').addEventListener('click', function (e) {
+    var key = e.target.closest('.key');
+    if (!key) return;
+    if (key.hasAttribute('data-back')) { inputEl.value = inputEl.value.slice(0, -1); }
+    else if (key.hasAttribute('data-space')) { inputEl.value += ' '; }
+    else if (key.classList.contains('fn')) { return; } // shift / emoji / 123 / return — no-op
+    else { inputEl.value += key.textContent; }
+    refreshInput();
+  });
+})();
+</script>
+</body>
+</html>
