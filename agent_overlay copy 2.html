@@ -2295,5 +2295,99 @@ document.addEventListener('DOMContentLoaded', async function() {
   window.addEventListener('resize', function(){ scalePages(); });
 })();
 </script>
+<script>
+/* KWIQ — "What should I focus on today?" — calendar-aware daily focus.
+   Assumes read-only access to the agent's Command calendar. Registers by
+   wrapping the last handler in the dispatch chain (__kwiqCallList). */
+(function () {
+  var inst = null;
+  var CAL = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>';
+  /* today's agenda (mock). `note` allows inline <b> for emphasis. */
+  var SCHEDULE = [
+    { time: "9:00–9:30 AM",     appt: "Buyer consult · Carter Dean",          note: "New Facebook lead — your first meeting." },
+    { time: "10:00–11:00 AM",   appt: "Listing appointment · 6578 Rosewood Ave", note: "<b>You're pitching to win the listing.</b>" },
+    { time: "11:30 AM–12:30 PM", appt: "Lead-gen block",                        note: "Your daily calls — KWIQ has 10 ready." },
+    { time: "2:00–3:30 PM",     appt: "Buyer showings · The Websters",         note: "Three homes — tour set in Command." },
+    { time: "4:00–4:30 PM",     appt: "Closing walkthrough · Alexis Nichols",  note: "Closes in 6 days." }
+  ];
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function msgsEl() { return document.querySelector('[data-kwiq-messages]'); }
+  function isFocus(t) {
+    t = (t || "").toLowerCase();
+    return /what (should|do|can) i (focus|work) on|what (should|do) i prioriti[sz]e|focus (on )?today|prioriti[sz]e (my )?(day|today)|what('?s| is) my day|what does my day look like|what.?s on my (calendar|schedule|day)|my schedule today|plan my day|what should i do today/.test(t);
+  }
+  function todayStr() {
+    try { return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); }
+    catch (e) { return "today"; }
+  }
+  function kf() {
+    if (document.getElementById('kwiq-focus-css')) return;
+    var s = document.createElement('style'); s.id = 'kwiq-focus-css';
+    s.textContent =
+      '@keyframes kfIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+      '.kf-wrap{animation:kfIn .42s cubic-bezier(.16,1,.3,1) both;}' +
+      '.kf-src{display:flex;align-items:center;gap:7px;font:400 13px/18px Mulish,sans-serif;color:#6c727e;margin:0 0 14px;}' +
+      '.kf-src svg{opacity:.7;flex:none;}' +
+      '.kf-h{font:400 20px/28px Mulish,sans-serif;color:#3d424d;margin:0 0 16px;}' +
+      '.kf-h b{font-weight:800;color:#282B33;}' +
+      '.kf-table{border-collapse:separate;border-spacing:0;width:100%;max-width:760px;border:1px solid rgba(43,43,51,.1);border-radius:8px;overflow:hidden;margin:0 0 18px;background:#fff;}' +
+      '.kf-table th{background:#f2f2f4;text-align:left;font:700 12px/16px Mulish,sans-serif;letter-spacing:.02em;color:#6c727e;padding:11px 16px;border-bottom:1px solid rgba(43,43,51,.1);}' +
+      '.kf-table td{padding:13px 16px;border-top:1px solid rgba(43,43,51,.08);font:400 14px/20px Mulish,sans-serif;color:#3d424d;vertical-align:top;}' +
+      '.kf-table tbody tr:first-child td{border-top:none;}' +
+      '.kf-time{font-weight:800!important;color:#282B33!important;white-space:nowrap;}' +
+      '.kf-meet{font-weight:700;color:#282B33;}' +
+      '.kf-note{color:#6c727e;}' +
+      '.kf-note b{color:#282B33;font-weight:700;}' +
+      '.kf-sum,.kf-follow{font:400 16px/24px Mulish,sans-serif;color:#3d424d;max-width:760px;margin:0 0 16px;}' +
+      '.kf-sum b,.kf-follow b{color:#282B33;font-weight:800;}' +
+      '.kf-lead{font:700 16px/24px Mulish,sans-serif;color:#282B33;margin:0 0 8px;}' +
+      '.kf-list{margin:0 0 4px;padding-left:22px;max-width:760px;}' +
+      '.kf-list li{font:400 16px/24px Mulish,sans-serif;color:#3d424d;margin-bottom:8px;}' +
+      '.kf-list li b{color:#282B33;font-weight:800;}';
+    (document.head || document.documentElement).appendChild(s);
+  }
+  function row(r) {
+    return '<tr><td class="kf-time">' + esc(r.time) + '</td><td class="kf-meet">' + esc(r.appt) + '</td><td class="kf-note">' + r.note + '</td></tr>';
+  }
+  function render() {
+    kf();
+    var html = '<div class="kf-wrap" style="max-width:760px;">'
+      + '<div class="kf-src">' + CAL + 'Read from your connected Google Calendar · view-only</div>'
+      + '<div class="kf-h">Here’s your day — <b>' + esc(todayStr()) + '</b></div>'
+      + '<table class="kf-table"><thead><tr><th>Time</th><th>Appointment</th><th>Notes</th></tr></thead><tbody>'
+      + SCHEDULE.map(row).join('')
+      + '</tbody></table>'
+      + '<p class="kf-sum">A full front half — then a clear <b>12:30–2:00</b> block for lunch and the evening after 4:30 for follow-up and admin.</p>'
+      + '<p class="kf-lead">Two things worth prepping:</p>'
+      + '<ul class="kf-list">'
+      + '<li><b>Listing appointment (10:00)</b> — 6578 Rosewood Ave. Bring the CMA; it’s your best shot to win the listing.</li>'
+      + '<li><b>Closing walkthrough (4:00)</b> — Alexis Nichols. She closes in six days and the final numbers aren’t confirmed yet — worth a quick check before you go.</li>'
+      + '</ul>'
+      + '<p class="kf-follow">Want me to build the Rosewood CMA, or prep your buyer-consult agenda for Carter?</p>'
+      + '</div>';
+    var m = msgsEl(); if (!m) return;
+    var r = document.createElement('div'); r.setAttribute('data-kwiq-row', 'ai'); r.innerHTML = html; m.appendChild(r);
+    if (inst && inst.kwiqScrollToCard) inst.kwiqScrollToCard(r);
+    else { try { r.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { m.scrollTop = m.scrollHeight; } }
+  }
+  window.__kwiqFocus = function (text, instance) {
+    if (!isFocus(text)) return false;
+    inst = instance; kf();
+    if (inst && inst.kwiqMakeTyping) {
+      var t = inst.kwiqMakeTyping();
+      setTimeout(function () { try { if (t && t.remove) t.remove(); } catch (e) {} render(); }, 1600);
+    } else render();
+    return true;
+  };
+  /* Splice into the dispatch chain: run focus before the existing call-list handler. */
+  (function () {
+    var orig = window.__kwiqCallList;
+    window.__kwiqCallList = function (text, inst2) {
+      if (window.__kwiqFocus && window.__kwiqFocus(text, inst2)) return true;
+      return orig ? orig(text, inst2) : false;
+    };
+  })();
+})();
+</script>
 </body>
 </html>
